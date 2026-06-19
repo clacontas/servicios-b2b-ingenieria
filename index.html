@@ -55,7 +55,7 @@
     /* Estilos específicos para impresión impecable a PDF Carta */
     @page {
       size: 215.9mm 279.4mm; /* Tamaño Carta exacto */
-      margin: 0;             /* Elimina márgenes del navegador (y con ello la URL, fecha, número de página del browser) */
+      margin: 0;             /* Elimina márgenes del navegador (URL, fecha, nº de página del browser) */
     }
 
     @media print {
@@ -67,14 +67,18 @@
         width: 215.9mm !important;
       }
 
+      /* Eliminar padding del wrapper que genera página en blanco extra */
+      .flex-grow,
+      .flex-grow.min-w-0,
+      #brochure-pages-container {
+        padding: 0 !important;
+        margin: 0 !important;
+        gap: 0 !important;
+      }
+
       /* Ocultar toda la interfaz de editor */
       .no-print {
         display: none !important;
-      }
-
-      /* Contenedor de páginas sin espaciado extra */
-      #brochure-pages-container {
-        gap: 0 !important;
       }
 
       /* Cada página ocupa exactamente una hoja Carta */
@@ -99,10 +103,11 @@
         position: relative !important;
       }
 
-      /* Última página sin salto forzado */
-      .brochure-page:last-child {
-        page-break-after: auto;
-        break-after: auto;
+      /* Última página: sin salto forzado al final (evita la página en blanco) */
+      .brochure-page:last-child,
+      .brochure-page:last-of-type {
+        page-break-after: avoid !important;
+        break-after: avoid !important;
       }
 
       /* Ocultar zonas de carga de imagen vacías */
@@ -282,7 +287,7 @@
     </div>
 
     <!-- CONTENIDO PRINCIPAL: BROCHURE -->
-    <div class="flex-grow min-w-0 overflow-y-auto bg-slate-100 pb-12">
+    <div class="flex-grow min-w-0 overflow-y-auto bg-slate-100 pb-12 print:pb-0">
 
       <!-- BARRA DE CONTROL SUPERIOR (RESPONSIVA) -->
       <div class="no-print bg-slate-900 text-white py-4 px-4 sm:px-6 sticky top-0 z-40 shadow-xl border-b border-slate-800 font-medium font-inter">
