@@ -12,6 +12,8 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- QRious JS Library for scannable QR generation -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   
   <style>
     body {
@@ -274,15 +276,9 @@
               <p class="text-xs text-slate-400 mt-1" contenteditable="true">Construyendo un futuro juntos • Edición 2026</p>
             </div>
             <div class="flex items-center gap-4">
-              <div class="bg-white p-1.5 rounded-lg shadow-md">
-                <svg class="w-12 h-12 text-slate-900" viewBox="0 0 100 100">
-                  <rect x="0" y="0" width="30" height="30" fill="currentColor"/> <rect x="5" y="5" width="20" height="20" fill="white"/> <rect x="10" y="10" width="10" height="10" fill="currentColor"/>
-                  <rect x="70" y="0" width="30" height="30" fill="currentColor"/> <rect x="75" y="5" width="20" height="20" fill="white"/> <rect x="80" y="10" width="10" height="10" fill="currentColor"/>
-                  <rect x="0" y="70" width="30" height="30" fill="currentColor"/> <rect x="5" y="75" width="20" height="20" fill="white"/> <rect x="10" y="80" width="10" height="10" fill="currentColor"/>
-                  <rect x="40" y="10" width="10" height="20" fill="currentColor"/> <rect x="55" y="0" width="10" height="10" fill="currentColor"/>
-                  <rect x="45" y="45" width="15" height="15" fill="currentColor"/> <rect x="80" y="45" width="10" height="20" fill="currentColor"/>
-                  <rect x="40" y="80" width="20" height="10" fill="currentColor"/> <rect x="80" y="80" width="15" height="15" fill="currentColor"/>
-                </svg>
+              <!-- CÓDIGO QR REAL GENERADO DINÁMICAMENTE -->
+              <div class="bg-white p-1 rounded-lg shadow-md flex items-center justify-center w-14 h-14 overflow-hidden">
+                <canvas id="qr-canvas" class="w-full h-full"></canvas>
               </div>
               <div>
                 <p class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold">Consultas Técnicas</p>
@@ -391,7 +387,7 @@
               <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true">Módulo de Especialidad</span>
               <h2 class="text-2xl font-bold text-slate-900 mb-2" contenteditable="true">Monitoreo de Temperatura y Humedad</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
-                Garantizamos la seguridad, trazabilidad y máxima calidad en la cadena de frío. Automatiza el control en tus bodegas, laboratorios and logística de tránsito mediante alertas inteligentes instantáneas.
+                Garantizamos la seguridad, trazabilidad y máxima calidad en la cadena de frío. Automatiza el control en tus bodegas, laboratorios y logística de tránsito mediante alertas inteligentes instantáneas.
               </p>
             </div>
 
@@ -598,7 +594,7 @@
                 <div class="md:col-span-4 h-28 bg-slate-200 border border-slate-300 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Planta Solar">
-                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex items-center gap-1 text-[10px] font-semibold p-2">
+                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center gap-1 text-[10px] font-semibold p-2">
                     <i class="fa-regular fa-image text-lg"></i>
                     <span>Foto Planta Solar</span>
                   </div>
@@ -806,7 +802,7 @@
       `;
     }
 
-    // Inicializa controles de bloque en todos los bloques estáticos cargados por defecto
+    // Inicializa controles de bloque en todos los bloques estáticos cargados por defecto e inicializa el QR
     document.addEventListener("DOMContentLoaded", function() {
       const blocks = document.querySelectorAll('.mci-block');
       blocks.forEach(block => {
@@ -814,7 +810,40 @@
           block.insertAdjacentHTML('afterbegin', getControlsHTML());
         }
       });
+
+      // INICIALIZACIÓN DEL CÓDIGO QR ESCANEABLE REAL
+      try {
+        if (typeof QRious !== 'undefined') {
+          new QRious({
+            element: document.getElementById('qr-canvas'),
+            value: 'https://ing.mcielectronics.cl/contacto-2',
+            size: 150,
+            background: 'white',
+            foreground: '#0f172a' // slate-900
+          });
+        } else {
+          drawFallbackQR();
+        }
+      } catch (e) {
+        console.error("No se pudo cargar QRious, dibujando fallback", e);
+        drawFallbackQR();
+      }
     });
+
+    // Fallback gráfico de seguridad si la CDN de QRious no cargara correctamente
+    function drawFallbackQR() {
+      const canvas = document.getElementById('qr-canvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      canvas.width = 100;
+      canvas.height = 100;
+      ctx.fillStyle = "#0f172a";
+      // Draw standard square corners of a mock QR code
+      ctx.fillRect(0, 0, 30, 30); ctx.fillStyle = "white"; ctx.fillRect(5, 5, 20, 20); ctx.fillStyle = "#0f172a"; ctx.fillRect(10, 10, 10, 10);
+      ctx.fillRect(70, 0, 30, 30); ctx.fillStyle = "white"; ctx.fillRect(75, 5, 20, 20); ctx.fillStyle = "#0f172a"; ctx.fillRect(80, 10, 10, 10);
+      ctx.fillRect(0, 70, 30, 30); ctx.fillStyle = "white"; ctx.fillRect(5, 75, 20, 20); ctx.fillStyle = "#0f172a"; ctx.fillRect(10, 80, 10, 10);
+      ctx.fillRect(40, 40, 20, 20); ctx.fillRect(45, 15, 10, 15); ctx.fillRect(80, 45, 15, 10); ctx.fillRect(45, 80, 15, 15);
+    }
 
     // Desplazamiento rápido entre páginas usando el menú del constructor
     function scrollToPage(pageNumber) {
