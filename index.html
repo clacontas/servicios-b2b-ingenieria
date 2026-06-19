@@ -12,12 +12,6 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  
-  <!-- Firebase Compat SDKs (UMD para estabilidad absoluta sin fallas de importación) -->
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
-  
   <!-- QRious JS Library for scannable QR generation -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
   
@@ -124,16 +118,16 @@
     }
   </style>
 </head>
-<body class="text-slate-800 antialiased overflow-x-hidden font-inter">
+<body class="text-slate-800 antialiased overflow-x-hidden">
 
   <!-- CONTENEDOR FLEX PRINCIPAL: SIDEBAR + BROCHURE -->
   <div class="flex min-h-screen relative">
 
     <!-- CAPA OSCURA DE FONDO PARA MÓVILES (NO SE IMPRIME) -->
-    <div id="sidebar-overlay" class="hidden fixed inset-0 bg-slate-950/60 z-40 lg:hidden no-print transition-opacity duration-300"></div>
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-slate-950/60 z-40 lg:hidden no-print transition-opacity duration-300"></div>
 
     <!-- BARRA LATERAL IZQUIERDA DE HERRAMIENTAS Y CONSTRUCCIÓN (RESPONSIVA & COLAPSABLE) -->
-    <div id="page-builder-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-80 bg-slate-900 text-white p-6 overflow-y-auto no-print border-r border-slate-800 shadow-2xl flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out font-inter font-medium text-slate-300">
+    <div id="page-builder-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-80 bg-slate-900 text-white p-6 overflow-y-auto no-print border-r border-slate-800 shadow-2xl flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out font-inter font-medium text-slate-300 font-inter">
       
       <div class="space-y-6">
         <!-- Brand & Botón Cerrar en Móviles -->
@@ -143,11 +137,11 @@
               <i class="fa-solid fa-cubes text-xl"></i>
             </div>
             <div>
-              <h2 class="font-extrabold text-base leading-tight text-white font-poppins">MCI Page Builder</h2>
+              <h2 class="font-extrabold text-base leading-tight text-white">MCI Page Builder</h2>
               <p class="text-[10px] text-slate-400">Constructor de Propuestas IoT</p>
             </div>
           </div>
-          <button id="close-sidebar-btn" class="lg:hidden text-slate-400 hover:text-white p-1 rounded-lg">
+          <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white p-1 rounded-lg">
             <i class="fa-solid fa-xmark text-lg"></i>
           </button>
         </div>
@@ -155,18 +149,18 @@
         <!-- INDICADOR DE ESTADO CLOUD/SINCRONIZACIÓN CON CONFIGURADOR INCORPORADO -->
         <div class="bg-slate-800/80 rounded-xl p-3 border border-slate-700/50 space-y-2">
           <div class="flex items-center justify-between text-xs">
-            <span class="text-slate-400 font-semibold font-inter">Estado de Nube:</span>
-            <span id="cloud-status-badge" class="bg-slate-500/10 text-slate-400 px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 font-inter">
+            <span class="text-slate-400 font-semibold">Estado de Nube:</span>
+            <span id="cloud-status-badge" class="bg-slate-500/10 text-slate-400 px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wider flex items-center gap-1">
               Modo Local
             </span>
           </div>
           
-          <button id="save-cloud-btn" disabled class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-3 rounded-lg shadow transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed font-inter">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Guardar en Vercel (Nube)
+          <button id="save-cloud-btn" onclick="saveToCloud()" disabled class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-3 rounded-lg shadow transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar en la Nube
           </button>
 
           <!-- Toggle de Configuración de Firebase para Marketing -->
-          <button id="toggle-config-btn" class="w-full bg-slate-750 hover:bg-slate-700 text-slate-300 border border-slate-700 hover:border-slate-650 font-medium text-[10px] py-1.5 px-3 rounded-lg transition-all flex items-center justify-center gap-1.5 mt-2 font-inter">
+          <button onclick="toggleConfigPanel()" class="w-full bg-slate-750 hover:bg-slate-700 text-slate-300 border border-slate-700 hover:border-slate-650 font-medium text-[10px] py-1.5 px-3 rounded-lg transition-all flex items-center justify-center gap-1.5 mt-2">
             <i class="fa-solid fa-gears text-sky-400"></i> Configurar Firebase (Marketing)
           </button>
 
@@ -174,16 +168,16 @@
           <div id="firebase-config-panel" class="hidden pt-2 border-t border-slate-700/40 space-y-2">
             <p class="text-[9px] text-slate-400 font-inter">Pega aquí el objeto de configuración JSON o el bloque JavaScript copiado directamente de Firebase:</p>
             <textarea id="firebase-json-input" rows="5" placeholder='const firebaseConfig = {&#10;  apiKey: "AIzaSy...",&#10;  authDomain: "..."&#10;};' class="w-full bg-slate-950 text-slate-200 border border-slate-700 rounded p-1.5 text-[9px] font-mono focus:outline-none focus:border-blue-500"></textarea>
-            <div class="flex gap-2 font-inter">
-              <button id="connect-firebase-btn" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold text-[10px] py-1.5 rounded transition-all">Conectar</button>
-              <button id="clear-firebase-btn" class="bg-red-950 hover:bg-red-900 text-red-300 font-semibold text-[10px] px-2 rounded transition-all" title="Eliminar Conexión"><i class="fa-solid fa-trash-can"></i></button>
+            <div class="flex gap-2">
+              <button onclick="saveFirebaseConfig()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold text-[10px] py-1.5 rounded transition-all">Conectar</button>
+              <button onclick="clearFirebaseConfig()" class="bg-red-950 hover:bg-red-900 text-red-300 font-semibold text-[10px] px-2 rounded transition-all" title="Eliminar Conexión"><i class="fa-solid fa-trash-can"></i></button>
             </div>
           </div>
         </div>
 
         <!-- Navegación de Páginas -->
         <div class="space-y-2">
-          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block font-inter">Navegación de Páginas</span>
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Navegación de Páginas</span>
           <div class="grid grid-cols-3 gap-1 text-center font-inter">
             <button onclick="scrollToPage(1)" class="bg-slate-800 hover:bg-slate-700 py-1.5 rounded text-xs transition-colors font-medium">Pág 1</button>
             <button onclick="scrollToPage(2)" class="bg-slate-800 hover:bg-slate-700 py-1.5 rounded text-xs transition-colors font-medium">Pág 2</button>
@@ -196,23 +190,23 @@
 
         <!-- Controles del Constructor Modular -->
         <div class="space-y-4 pt-2">
-          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block border-t border-slate-800 pt-4 font-inter">Añadir Nuevos Componentes</span>
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block border-t border-slate-800 pt-4">Añadir Nuevos Componentes</span>
           
           <div>
-            <label class="block text-[10px] font-medium text-slate-400 mb-1 font-inter">1. Seleccionar Página de Destino</label>
-            <select id="target-page-select" class="w-full bg-slate-800 text-white rounded-lg p-2 text-xs border border-slate-700 focus:outline-none focus:border-blue-500 font-inter">
-              <option value="page-1-content font-inter">Página 1 (Portada)</option>
-              <option value="page-2-content font-inter">Página 2 (Flujo Telemetría)</option>
-              <option value="page-3-content font-inter" selected>Página 3 (Temperatura)</option>
-              <option value="page-4-content font-inter">Página 4 (Energía)</option>
-              <option value="page-5-content font-inter">Página 5 (Complementarios)</option>
-              <option value="page-6-content font-inter font-inter">Página 6 (Contacto/Metodología)</option>
+            <label class="block text-[10px] font-medium text-slate-400 mb-1">1. Seleccionar Página de Destino</label>
+            <select id="target-page-select" class="w-full bg-slate-800 text-white rounded-lg p-2 text-xs border border-slate-700 focus:outline-none focus:border-blue-500">
+              <option value="page-1-content">Página 1 (Portada)</option>
+              <option value="page-2-content">Página 2 (Flujo Telemetría)</option>
+              <option value="page-3-content" selected>Página 3 (Temperatura)</option>
+              <option value="page-4-content">Página 4 (Energía)</option>
+              <option value="page-5-content">Página 5 (Complementarios)</option>
+              <option value="page-6-content">Página 6 (Contacto/Metodología)</option>
             </select>
           </div>
 
           <div>
-            <label class="block text-[10px] font-medium text-slate-400 mb-2 font-inter font-inter">2. Haz clic para insertar:</label>
-            <div class="grid grid-cols-1 gap-2 font-inter font-normal font-inter">
+            <label class="block text-[10px] font-medium text-slate-400 mb-2 font-inter">2. Haz clic para insertar:</label>
+            <div class="grid grid-cols-1 gap-2 font-inter font-normal">
               <button onclick="addComponent('title')" class="bg-slate-800 hover:bg-slate-700 hover:border-sky-500 text-left text-xs py-2 px-3 rounded-lg border border-slate-700/50 transition-all flex items-center gap-2">
                 <i class="fa-solid fa-heading text-sky-400 w-4"></i> Título con barra de acento
               </button>
@@ -233,7 +227,7 @@
       <!-- Footer del Sidebar con créditos e instrucciones -->
       <div class="border-t border-slate-800 pt-4 mt-6 text-[11px] text-slate-500 space-y-2 font-inter">
         <p><i class="fa-solid fa-circle-question mr-1 text-slate-400"></i> Al terminar tus cambios, pulsa "Guardar Plantilla" para descargar tu archivo HTML.</p>
-        <p class="text-[10px] text-slate-600 font-semibold uppercase font-inter">MCI Electronics © 2026</p>
+        <p class="text-[10px] text-slate-600 font-semibold uppercase">MCI Electronics © 2026</p>
       </div>
     </div>
 
@@ -245,18 +239,18 @@
         <div class="max-w-5xl mx-auto flex items-center justify-between gap-4">
           
           <!-- Botón Menú Hamburguesa en Móviles -->
-          <button id="menu-hamburger-btn" class="lg:hidden bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white p-2.5 rounded-lg transition-colors flex items-center justify-center">
+          <button onclick="toggleSidebar()" class="lg:hidden bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white p-2.5 rounded-lg transition-colors flex items-center justify-center">
             <i class="fa-solid fa-bars text-base"></i>
           </button>
 
           <!-- Logo / Título de la App -->
-          <div class="flex items-center gap-3 mr-auto sm:mr-0 font-inter">
+          <div class="flex items-center gap-3 mr-auto sm:mr-0">
             <div class="bg-blue-600 p-2 rounded-lg hidden sm:block">
               <i class="fa-solid fa-file-pdf text-xl"></i>
             </div>
             <div>
               <h1 class="font-bold text-sm sm:text-base leading-tight">MCI Ingeniería - Editor</h1>
-              <p class="text-[9px] sm:text-[10px] text-slate-400 font-medium font-inter">Crea propuestas en formato Carta</p>
+              <p class="text-[9px] sm:text-[10px] text-slate-400 font-medium">Crea propuestas en formato Carta</p>
             </div>
           </div>
           
@@ -264,11 +258,11 @@
           <div class="flex items-center gap-2 sm:gap-3">
             <!-- Descargar copia HTML con cambios permanentemente guardados -->
             <button onclick="downloadEditedHTML()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-500 font-semibold px-2.5 sm:px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5" title="Guardar cambios en archivo HTML">
-              <i class="fa-solid fa-code font-inter"></i> <span class="hidden sm:inline">Guardar Plantilla</span>
+              <i class="fa-solid fa-code"></i> <span class="hidden sm:inline">Guardar Plantilla</span>
             </button>
             <!-- Imprimir/Exportar a PDF -->
             <button onclick="window.print()" class="bg-gradient-to-r from-blue-500 to-sky-400 hover:from-blue-600 hover:to-sky-500 text-white font-semibold px-3 sm:px-5 py-2 rounded-lg shadow-lg transition-all transform hover:-translate-y-0.5 text-xs flex items-center gap-1.5">
-              <i class="fa-solid fa-file-export font-inter"></i> <span>PDF (Carta)</span>
+              <i class="fa-solid fa-file-export"></i> <span>PDF (Carta)</span>
             </button>
           </div>
         </div>
@@ -317,7 +311,7 @@
                 </h1>
                 <div class="accent-bar w-24 mt-2 rounded"></div>
               </div>
-              <div class="mci-block relative group rounded-xl p-2 font-inter">
+              <div class="mci-block relative group rounded-xl p-2">
                 <p class="text-slate-300 text-sm leading-relaxed" contenteditable="true">
                   Optimiza la gestión operacional, asegura la calidad de tus procesos críticos y reduce tus costos de energía con tecnología inalámbrica de vanguardia.
                 </p>
@@ -371,9 +365,9 @@
           <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4 font-inter">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
-              <span class="text-sm font-extrabold text-slate-900 font-poppins">Soluciones de Telemetría</span>
+              <span class="text-sm font-extrabold text-slate-900">Soluciones de Telemetría</span>
             </div>
-            <span class="text-[11px] text-slate-400 font-inter" contenteditable="true font-inter">ing.mcielectronics.cl</span>
+            <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
           </div>
 
           <!-- Contenido Modificable Página 2 -->
@@ -414,7 +408,7 @@
                     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
                       <i class="fa-solid fa-cloud text-xl"></i>
                     </div>
-                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1" contenteditable="true">03. Servidor MCIIoT</h4>
+                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true">03. Servidor MCIIoT</h4>
                     <p class="text-[11px] text-slate-500 mb-1" contenteditable="true">Almacena, despliega y analiza los datos recopilados.</p>
                     <span class="text-[9px] bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded-full uppercase" contenteditable="true">Alertas y Dashboards</span>
                   </div>
@@ -427,13 +421,13 @@
             <!-- Doble Tarjeta Informativa -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
               <div class="mci-block relative group rounded-xl p-2 bg-blue-50/60 border border-blue-100/50">
-                <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins"><i class="fa-solid fa-shield-halved mr-1 font-inter"></i> Resiliencia ante Desconexión</h4>
+                <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins" contenteditable="true"><i class="fa-solid fa-shield-halved mr-1"></i> Resiliencia ante Desconexión</h4>
                 <p class="text-slate-600 text-[11px] leading-relaxed" contenteditable="true">
                   ¿Se cayó el internet? No hay pérdida de datos. Nuestros sensores guardan la trazabilidad internamente y la retransmiten con marca de tiempo exacta una vez que la red regresa.
                 </p>
               </div>
               <div class="mci-block relative group rounded-xl p-2 bg-blue-50/60 border border-blue-100/50">
-                <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins"><i class="fa-solid fa-network-wired mr-1 font-inter"></i> Flexibilidad de Plataforma</h4>
+                <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins" contenteditable="true"><i class="fa-solid fa-network-wired mr-1"></i> Flexibilidad de Plataforma</h4>
                 <p class="text-slate-600 text-[11px] leading-relaxed" contenteditable="true">
                   Visualiza en nuestra amigable plataforma en la nube **MCIIoT** o despacha datos directamente a tus propios sistemas locales mediante integraciones API o protocolos industriales de comunicación.
                 </p>
@@ -449,21 +443,21 @@
 
 
         <!-- ================= PÁGINA 3: TEMPERATURA Y HUMEDAD ================= -->
-        <div id="brochure-page-3" class="brochure-page text-slate-800 font-inter">
+        <div id="brochure-page-3" class="brochure-page text-slate-800">
           <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 font-inter">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
-              <span class="text-sm font-extrabold text-slate-900 font-poppins">Monitoreo de Condiciones</span>
+              <span class="text-sm font-extrabold text-slate-900">Monitoreo de Condiciones</span>
             </div>
             <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
           </div>
 
           <!-- Contenido Modificable Página 3 -->
           <div id="page-3-content" class="my-auto space-y-4 font-inter">
-            <div class="mci-block relative group rounded-xl p-2 font-poppins font-inter">
-              <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true">Módulo de Especialidad</span>
+            <div class="mci-block relative group rounded-xl p-2">
+              <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true font-poppins">Módulo de Especialidad</span>
               <h2 class="text-2xl font-bold text-slate-900 mb-1 font-poppins" contenteditable="true">Monitoreo de Temperatura y Humedad</h2>
-              <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true font-inter">
+              <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
                 Garantizamos la seguridad y máxima calidad en la cadena de frío. Automatiza el control en tus bodegas, laboratorios y logística de tránsito mediante alertas inteligentes instantáneas.
               </p>
             </div>
@@ -483,10 +477,10 @@
                       <rect x="8" y="6" width="8" height="6" rx="1" fill="currentColor" opacity="0.3"/>
                       <circle cx="12" cy="16" r="2" fill="currentColor"/>
                     </svg>
-                    <span class="text-[6px] font-extrabold uppercase mt-1 font-inter font-bold">VER DISPOSITIVO</span>
+                    <span class="text-[6px] font-extrabold uppercase mt-1">VER DISPOSITIVO</span>
                   </div>
                 </div>
-                <div class="flex-grow font-inter">
+                <div class="flex-grow">
                   <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">01. Sonoff TH Elite</h4>
                   <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
                     Controlador inteligente para interiores con pantalla LCD. Automatiza y regula sistemas de climatización de forma ágil y económica.
@@ -495,7 +489,7 @@
               </div>
 
               <!-- Teltonika -->
-              <div class="mci-block relative group p-2.5 bg-sky-50 rounded-xl border border-sky-100 flex gap-3 items-center font-inter">
+              <div class="mci-block relative group p-2.5 bg-sky-50 rounded-xl border border-sky-100 flex gap-3 items-center">
                 <div class="w-16 h-16 bg-sky-100/50 border border-sky-200 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Teltonika">
@@ -506,10 +500,10 @@
                       <path d="M12,6 L12,18 M6,12 L18,12" stroke-dasharray="2 2"/>
                       <circle cx="12" cy="12" r="3" fill="currentColor"/>
                     </svg>
-                    <span class="text-[6px] font-extrabold uppercase mt-1 font-inter font-bold">TECNOLOGÍA BLE</span>
+                    <span class="text-[6px] font-extrabold uppercase mt-1">TECNOLOGÍA BLE</span>
                   </div>
                 </div>
-                <div class="flex-grow font-inter">
+                <div class="flex-grow">
                   <h4 class="font-bold text-xs uppercase text-blue-900 font-poppins" contenteditable="true">02. Teltonika EYE Sensor</h4>
                   <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
                     Baliza Bluetooth (BLE) ultra-robusta e impermeable IP67. Se vincula con gateways móviles para auditar la temperatura en ruta de despacho.
@@ -518,22 +512,22 @@
               </div>
 
               <!-- iButton -->
-              <div class="mci-block relative group p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center font-inter">
+              <div class="mci-block relative group p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
                 <div class="w-16 h-16 bg-slate-200 border border-slate-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="iButton">
                   <!-- SVG Pre-cargado de iButton -->
-                  <div class="image-upload-placeholder-icon text-slate-600 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
+                  <div class="image-upload-placeholder-icon text-slate-600 group-hover/img:text-slate-500 transition-colors flex flex-col items-center">
                     <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
                       <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
                       <circle cx="12" cy="12" r="6" fill="currentColor" opacity="0.4"/>
                       <circle cx="12" cy="12" r="3" fill="currentColor"/>
                     </svg>
-                    <span class="text-[6px] font-extrabold uppercase mt-1 font-inter font-bold">IBUTTON DISK</span>
+                    <span class="text-[6px] font-extrabold uppercase mt-1">IBUTTON DISK</span>
                   </div>
                 </div>
-                <div class="flex-grow font-inter">
-                  <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true font-inter">03. iButton Data Loggers</h4>
+                <div class="flex-grow">
+                  <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">03. iButton Data Loggers</h4>
                   <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
                     Contacto metálico encapsulado autónomo con memoria. Ideal para auditorías directas en cajas de despacho de vacunas y fármacos.
                   </p>
@@ -541,7 +535,7 @@
               </div>
 
               <!-- Milesight -->
-              <div class="mci-block relative group p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center font-inter font-inter">
+              <div class="mci-block relative group p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
                 <div class="w-16 h-16 bg-blue-50 border border-blue-200 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Milesight">
@@ -552,11 +546,11 @@
                       <path d="M12,2 L12,6" stroke="currentColor" stroke-width="2"/>
                       <rect x="9" y="10" width="6" height="4" fill="currentColor" opacity="0.3"/>
                     </svg>
-                    <span class="text-[6px] font-extrabold uppercase mt-1 font-inter font-bold">LORA INDUSTRIAL</span>
+                    <span class="text-[6px] font-extrabold uppercase mt-1">LORA INDUSTRIAL</span>
                   </div>
                 </div>
-                <div class="flex-grow font-inter">
-                  <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true font-poppins">04. Milesight TS301</h4>
+                <div class="flex-grow">
+                  <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">04. Milesight TS301</h4>
                   <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
                     Sonda LoRaWAN de nivel industrial. Coberturas excepcionales y baterías de hasta 5 años para grandes laboratorios o cámaras de frío.
                   </p>
@@ -567,14 +561,14 @@
 
             <!-- Caso de éxito (Temperatura y Humedad - Anonimizado para cumplir NT 147 ISP) -->
             <div class="mci-block relative group rounded-xl p-2 border border-slate-100 bg-slate-50/60 font-inter">
-              <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center font-inter">
-                <div class="md:col-span-9 font-inter">
-                  <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins"><i class="fa-solid fa-file-shield mr-1 font-inter"></i> Caso de Éxito: Cumplimiento de Normativa Sanitaria (NT 147 ISP)</h4>
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                <div class="md:col-span-9">
+                  <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins"><i class="fa-solid fa-file-shield mr-1"></i> Caso de Éxito: Cumplimiento de Normativa Sanitaria (NT 147 ISP)</h4>
                   <p class="text-[10px] text-slate-600 leading-relaxed font-normal" contenteditable="true">
                     Diseñamos e implementamos un sistema de telemetría IoT de alta precisión para una destacada empresa líder en logística farmacéutica. Integramos gateways industriales **Milesight UG65** con una red de sensores inalámbricos de temperatura y humedad distribuidos en bodega. Los datos se transmiten encriptados en tiempo real a **MCIIoT**, automatizando la entrega de informes semanales requeridos y activando alertas inmediatas vía correo electrónico y Telegram ante cualquier desviación térmica, garantizando el cumplimiento de la norma NT 147 del ISP de Chile y asegurando la continuidad operativa del centro.
                   </p>
                 </div>
-                <div class="md:col-span-3 h-24 bg-blue-50 border border-blue-200 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center font-inter" onclick="triggerImageUpload(this)">
+                <div class="md:col-span-3 h-24 bg-blue-50 border border-blue-200 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Bodega Fármacos">
                   <!-- SVG Pre-cargado de Bodega Segura NT147 -->
@@ -583,22 +577,22 @@
                       <path d="M3,9 L12,2 L21,9 L21,20 L3,21 Z" fill="currentColor" fill-opacity="0.1"/>
                       <path d="M12,11 L12,17 M9,14 L15,14" stroke="currentColor" stroke-width="2.5"/>
                     </svg>
-                    <span class="text-[7px] font-extrabold uppercase mt-1 font-inter font-bold">BODEGA SANITARIA</span>
+                    <span class="text-[7px] font-extrabold uppercase mt-1">BODEGA SANITARIA</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- CTA de Alertas -->
-            <div class="mci-block relative group rounded-xl p-1 font-inter">
+            <div class="mci-block relative group rounded-xl p-1">
               <div class="bg-slate-900 text-white rounded-xl p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div class="max-w-md">
-                  <h4 class="font-bold text-xs uppercase text-sky-400 font-poppins font-bold" contenteditable="true">¿Sufres pérdidas por fallas en climatización?</h4>
+                  <h4 class="font-bold text-xs uppercase text-sky-400" contenteditable="true">¿Sufres pérdidas por fallas en climatización?</h4>
                   <p class="text-[9px] text-slate-300 mt-0.5" contenteditable="true">
                     Configura alertas inmediatas a tus equipos vía Telegram, Correo o llamada ante cualquier quiebre térmico.
                   </p>
                 </div>
-                <a href="mailto:ingenieria@mcielectronics.cl" class="bg-blue-600 text-white font-bold text-xs px-3 py-1.5 rounded shadow hover:bg-blue-700 transition-colors whitespace-nowrap text-center font-inter" contenteditable="true">Saber Más</a>
+                <a href="mailto:ingenieria@mcielectronics.cl" class="bg-blue-600 text-white font-bold text-xs px-3 py-1.5 rounded shadow hover:bg-blue-700 transition-colors whitespace-nowrap text-center" contenteditable="true">Saber Más</a>
               </div>
             </div>
           </div>
@@ -611,20 +605,20 @@
 
 
         <!-- ================= PÁGINA 4: CONSUMO ENERGÉTICO ================= -->
-        <div id="brochure-page-4" class="brochure-page text-slate-800 font-inter font-inter">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
+        <div id="brochure-page-4" class="brochure-page text-slate-800">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 font-inter">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
-              <span class="text-sm font-extrabold text-slate-900 font-poppins font-poppins">Eficiencia Energética</span>
+              <span class="text-sm font-extrabold text-slate-900">Eficiencia Energética</span>
             </div>
             <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
           </div>
 
           <!-- Contenido Modificable Página 4 -->
           <div id="page-4-content" class="my-auto space-y-4 font-inter">
-            <div class="mci-block relative group rounded-xl p-2 font-poppins">
-              <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true">Gestión de Consumos</span>
-              <h2 class="text-2xl font-bold text-slate-900 mb-1" contenteditable="true">Monitoreo de Consumo Energético</h2>
+            <div class="mci-block relative group rounded-xl p-2">
+              <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase font-poppins" contenteditable="true">Gestión de Consumos</span>
+              <h2 class="text-2xl font-bold text-slate-900 mb-1 font-poppins" contenteditable="true">Monitoreo de Consumo Energético</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
                 Toma el control absoluto del gasto eléctrico de tu negocio. Nuestras tecnologías te permiten mapear en tiempo real los consumos, optimizar el uso de tus recursos y cumplir con las normativas del país.
               </p>
@@ -634,9 +628,9 @@
             <div class="mci-block relative group rounded-xl p-2">
               <div class="bg-gradient-to-r from-blue-900 to-slate-900 text-white p-3 rounded-xl flex items-center gap-3 border-l-4 border-sky-400">
                 <div class="bg-sky-500/15 p-2 rounded-lg text-sky-400 text-lg hidden sm:block">
-                  <i class="fa-solid fa-gavel font-inter"></i>
+                  <i class="fa-solid fa-gavel"></i>
                 </div>
-                <div class="text-xs">
+                <div class="text-xs font-inter">
                   <h4 class="font-bold uppercase text-sky-400 mb-0.5" contenteditable="true">Ley de Eficiencia Energética (Ley 21.305)</h4>
                   <p class="text-slate-300 text-[10px] leading-relaxed" contenteditable="true">
                     En Chile las grandes empresas deben implementar sistemas de gestión y reportar sus consumos de energía e intensidad al Ministerio. En MCI implementamos sistemas homologados listos para reportar.
@@ -647,14 +641,14 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <!-- Monitoreo No Invasivo -->
-              <div class="mci-block relative group rounded-xl p-3 bg-slate-50 border border-slate-100 flex flex-col justify-between font-inter">
+              <div class="mci-block relative group rounded-xl p-3 bg-slate-50 border border-slate-100 flex flex-col justify-between">
                 <div>
                   <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true"><i class="fa-solid fa-gauge-high mr-1 text-blue-600"></i> Medición Sin Intervención</h4>
                   <p class="text-[10px] text-slate-600 mb-2 leading-relaxed" contenteditable="true">
                     Instalamos sensores de corriente de pinza abierta **Milesight CT101/CT103**. Monitorea el consumo de tableros sin cortar suministro ni detener procesos.
                   </p>
                 </div>
-                <div class="w-full h-20 bg-blue-50 border border-blue-100 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center font-inter" onclick="triggerImageUpload(this)">
+                <div class="w-full h-20 bg-blue-50 border border-blue-100 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Tablero">
                   <!-- SVG de Pinza CT y Tablero Eléctrico -->
@@ -671,14 +665,14 @@
               </div>
 
               <!-- Control de Oficinas -->
-              <div class="mci-block relative group rounded-xl p-3 bg-slate-50 border border-slate-100 flex flex-col justify-between font-inter">
+              <div class="mci-block relative group rounded-xl p-3 bg-slate-50 border border-slate-100 flex flex-col justify-between">
                 <div>
                   <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true"><i class="fa-solid fa-building-circle-check mr-1 text-blue-600"></i> Edificios Inteligentes</h4>
-                  <p class="text-[10px] text-slate-600 mb-2 leading-relaxed" contenteditable="true font-inter">
+                  <p class="text-[10px] text-slate-600 mb-2 leading-relaxed" contenteditable="true">
                     Optimiza climatización (HVAC) acoplando sensores PIR, presencia y enchufes inteligentes LoRaWAN para cortes automatizados en horarios inhabiles.
                   </p>
                 </div>
-                <div class="w-full h-20 bg-blue-50 border border-blue-100 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center font-inter" onclick="triggerImageUpload(this)">
+                <div class="w-full h-20 bg-blue-50 border border-blue-100 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Edificio">
                   <!-- SVG de Automatización de Climatización de Oficinas -->
@@ -695,15 +689,15 @@
             </div>
 
             <!-- Caso de éxito -->
-            <div class="mci-block relative group rounded-xl p-2 border border-slate-100 bg-slate-50/60 font-inter">
+            <div class="mci-block relative group rounded-xl p-2 border border-slate-100 bg-slate-50/60">
               <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                <div class="md:col-span-9 font-inter">
-                  <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins"><i class="fa-solid fa-solar-panel mr-1 font-inter"></i> Caso de Éxito: Telemetría en Planta Solar</h4>
-                  <p class="text-[10px] text-slate-600 leading-relaxed font-normal" contenteditable="true font-inter">
+                <div class="md:col-span-9">
+                  <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins"><i class="fa-solid fa-solar-panel mr-1"></i> Caso de Éxito: Telemetría en Planta Solar</h4>
+                  <p class="text-[10px] text-slate-600 leading-relaxed font-normal" contenteditable="true">
                     Desarrollamos e integramos con éxito un sistema de medición energética en generación solar. Extraemos datos directamente de los inversores mediante protocolo Modbus TCP, transmitiéndolos vía celular (3G/4G) a nuestra nube **MCIIoT** para visualizar la generación en tiempo real y diagnosticar caídas remotamente.
                   </p>
                 </div>
-                <div class="md:col-span-3 h-24 bg-blue-50 border border-blue-200 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center font-inter" onclick="triggerImageUpload(this)">
+                <div class="md:col-span-3 h-24 bg-blue-50 border border-blue-200 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Planta Solar">
                   <!-- SVG de Planta Solar Pre-cargada -->
@@ -730,53 +724,53 @@
 
 
         <!-- ================= PÁGINA 5: COMPLEMENTARIO ================= -->
-        <div id="brochure-page-5" class="brochure-page text-slate-800 font-inter">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 font-inter font-inter">
+        <div id="brochure-page-5" class="brochure-page text-slate-800">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 font-inter">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
-              <span class="text-sm font-extrabold text-slate-900 font-poppins">Ecosistema Complementario</span>
+              <span class="text-sm font-extrabold text-slate-900">Ecosistema Complementario</span>
             </div>
-            <span class="text-[11px] text-slate-400" contenteditable="true font-inter">ing.mcielectronics.cl</span>
+            <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
           </div>
 
           <!-- Contenido Modificable Página 5 -->
-          <div id="page-5-content" class="my-auto space-y-6">
-            <div class="mci-block relative group rounded-xl p-2 text-center max-w-lg mx-auto font-poppins">
-              <h2 class="text-xl font-bold text-slate-900 mb-1" contenteditable="true">Ecosistema de Soluciones IoT e Ingeniería</h2>
+          <div id="page-5-content" class="my-auto space-y-6 font-inter">
+            <div class="mci-block relative group rounded-xl p-2 text-center max-w-lg mx-auto">
+              <h2 class="text-xl font-bold text-slate-900 mb-1 font-poppins" contenteditable="true">Ecosistema de Soluciones IoT e Ingeniería</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
                 Nuestra plataforma **MCIIoT** es versátil. Expandimos el poder de tu infraestructura agregando sensores de especialidad complementaria para resolver otras necesidades operacionales clave.
               </p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 font-inter">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
               
               <!-- Recursos Hídricos -->
               <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3">
-                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-droplet font-inter"></i></div>
+                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-droplet"></i></div>
                 <div>
                   <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">Control de Recursos Hídricos</h4>
-                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true font-inter">
+                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
                     Monitoreo continuo de flujo en sistemas de riego, niveles de agua en estanques mediante ultrasonido y detección de fugas en salas de bombas críticas.
                   </p>
                 </div>
               </div>
 
               <!-- Calidad de Aire -->
-              <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3 font-inter">
+              <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3">
                 <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-wind"></i></div>
                 <div>
-                  <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true font-poppins">Calidad Medioambiental (CO2 / UV)</h4>
-                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true font-inter">
+                  <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">Calidad Medioambiental (CO2 / UV)</h4>
+                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
                     Protección de colaboradores en exteriores mediante sensores de radiación UV y monitoreo de CO2 y ventilación en oficinas y salas de clases.
                   </p>
                 </div>
               </div>
 
               <!-- Conteo de Personas -->
-              <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3 font-inter">
+              <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3">
                 <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-people-group"></i></div>
                 <div>
-                  <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true font-poppins">Flujo de Personas y Activos</h4>
+                  <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">Flujo de Personas y Activos</h4>
                   <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
                     Analiza el tráfico de clientes en retail, optimiza el uso de salas corporativas o mide la tasa de ocupación de vehículos en estacionamientos.
                   </p>
@@ -784,8 +778,8 @@
               </div>
 
               <!-- Servicios de Ingeniería -->
-              <div class="mci-block relative group p-4 bg-blue-50/50 rounded-xl border border-blue-100/50 flex gap-3 font-inter">
-                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-microchip animate-pulse"></i></div>
+              <div class="mci-block relative group p-4 bg-blue-50/50 rounded-xl border border-blue-100/50 flex gap-3">
+                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-microchip"></i></div>
                 <div>
                   <h4 class="font-bold text-xs uppercase text-blue-900 font-poppins" contenteditable="true">Diseño Electrónico e Integración</h4>
                   <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
@@ -797,7 +791,7 @@
             </div>
           </div>
 
-          <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-[10px] text-slate-400 mt-4 font-inter font-inter">
+          <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-[10px] text-slate-400 mt-4 font-inter">
             <p>MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
             <p>Página 5</p>
           </div>
@@ -805,28 +799,28 @@
 
 
         <!-- ================= PÁGINA 6: METODOLOGÍA Y CIERRE ================= -->
-        <div id="brochure-page-6" class="brochure-page text-slate-800 font-inter">
+        <div id="brochure-page-6" class="brochure-page text-slate-800">
           <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 font-inter">
             <div>
-              <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block text-white font-poppins">MCI Ingeniería</span>
-              <span class="text-sm font-extrabold text-slate-900 font-poppins">Contacto y Metodología</span>
+              <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
+              <span class="text-sm font-extrabold text-slate-900">Contacto y Metodología</span>
             </div>
             <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
           </div>
 
           <!-- Contenido Modificable Página 6 -->
-          <div id="page-6-content" class="my-auto space-y-6">
+          <div id="page-6-content" class="my-auto space-y-6 font-inter">
             
-            <div class="mci-block relative group rounded-xl p-2 font-poppins">
-              <h2 class="text-lg font-bold text-slate-900 mb-1" contenteditable="true">¿Cómo implementamos la solución en tu negocio?</h2>
+            <div class="mci-block relative group rounded-xl p-2">
+              <h2 class="text-lg font-bold text-slate-900 mb-1 font-poppins" contenteditable="true">¿Cómo implementamos la solución en tu negocio?</h2>
               <p class="text-slate-600 text-[11px]" contenteditable="true">
                 Facilitamos tu transición tecnológica sin fricciones operativas de manera ágil en 4 fases clave:
               </p>
             </div>
 
             <!-- Fases -->
-            <div class="mci-block relative group rounded-xl p-2 font-inter">
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div class="mci-block relative group rounded-xl p-2">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-inter">
                 <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
                   <div class="text-lg font-extrabold text-blue-600 mb-1" contenteditable="true">Fase 1</div>
                   <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1 font-poppins" contenteditable="true">Diagnóstico</h4>
@@ -835,17 +829,17 @@
                 <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
                   <div class="text-lg font-extrabold text-blue-600 mb-1" contenteditable="true">Fase 2</div>
                   <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1 font-poppins" contenteditable="true">Propuesta</h4>
-                  <p class="text-[9px] text-slate-500" contenteditable="true font-inter">Cotización detallada de sensores, plazos y licenciamiento.</p>
+                  <p class="text-[9px] text-slate-500" contenteditable="true">Cotización detallada de sensores, plazos y licenciamiento.</p>
                 </div>
                 <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
                   <div class="text-lg font-extrabold text-blue-600 mb-1" contenteditable="true">Fase 3</div>
-                  <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1" contenteditable="true">Instalación</h4>
-                  <p class="text-[9px] text-slate-500" contenteditable="true font-inter">Montaje técnico in situ o despacho de kits autoinstalables.</p>
+                  <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1 font-poppins" contenteditable="true">Instalación</h4>
+                  <p class="text-[9px] text-slate-500" contenteditable="true">Montaje técnico in situ o despacho de kits autoinstalables.</p>
                 </div>
                 <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
                   <div class="text-lg font-extrabold text-blue-600 mb-1" contenteditable="true">Fase 4</div>
-                  <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1" contenteditable="true font-poppins font-poppins">Capacitación</h4>
-                  <p class="text-[9px] text-slate-500" contenteditable="true font-inter">Configuración de dashboards en MCIIoT y postventa.</p>
+                  <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1 font-poppins" contenteditable="true">Capacitación</h4>
+                  <p class="text-[9px] text-slate-500" contenteditable="true">Configuración de dashboards en MCIIoT y postventa.</p>
                 </div>
               </div>
             </div>
@@ -866,31 +860,29 @@
                   </div>
                 </div>
 
-                <div class="z-10 relative flex-grow font-inter">
-                  <span class="text-xs text-sky-400 uppercase tracking-widest font-semibold block mb-1">Contacto Comercial Directo</span>
+                <div class="z-10 relative flex-grow">
+                  <span class="text-xs text-sky-400 uppercase tracking-widest font-semibold block mb-1 font-inter">Contacto Comercial Directo</span>
                   <h3 class="text-lg font-bold" contenteditable="true">Nombre del Ejecutivo</h3>
-                  <p class="text-xs text-slate-400 mb-3" contenteditable="true">tucorreo@mcielectronics.cl • Tu cargo</p>
+                  <p class="text-xs text-slate-400 mb-3 font-inter" contenteditable="true">tucorreo@mcielectronics.cl • Tu cargo</p>
                   
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] border-t border-slate-800 pt-3">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] border-t border-slate-800 pt-3 font-inter">
                     <div class="space-y-1.5">
                       <p class="flex items-center gap-2">
-                        <i class="fa-solid fa-envelope text-sky-400 font-inter"></i>
+                        <i class="fa-solid fa-envelope text-sky-400"></i>
                         <span class="font-semibold" contenteditable="true">ingenieria@mcielectronics.cl</span>
                       </p>
                       <p class="flex items-center gap-2">
-                        <i class="fa-solid fa-phone text-sky-400 font-inter"></i>
+                        <i class="fa-solid fa-phone text-sky-400"></i>
                         <span contenteditable="true">+56 223339579</span>
                       </p>
                     </div>
                     <div class="space-y-1.5">
                       <p class="flex items-center gap-2">
-                        <i class="fa-solid fa-location-dot text-sky-400 font-inter"></i>
-                        <span contenteditable="true font-inter">Luis Thayer Ojeda 0115, Providencia, Chile</span>
+                        <i class="fa-solid fa-location-dot text-sky-400"></i>
+                        <span contenteditable="true">Luis Thayer Ojeda 0115, Providencia, Chile</span>
                       </p>
-                      <p class="flex items-center gap-2">
-                        <i class="fa-solid fa-globe text-sky-400 font-inter"></i>
-                        <span contenteditable="true">www.mcielectronics.cl</span>
-                      </p>
+                      <i class="fa-solid fa-globe text-sky-400"></i>
+                      <span contenteditable="true">www.mcielectronics.cl</span>
                     </div>
                   </div>
                 </div>
@@ -909,18 +901,246 @@
     </div>
   </div>
 
-  <!-- SINGLE ROBUST JAVASCRIPT MODULE FOR BOTH LOGIC AND FIREBASE -->
-  <script>
-    // Variables globales de la app
-    const appId = typeof __app_id !== 'undefined' ? __app_id : 'mci-brochure-master-app';
+  <!-- INTERACTIVE JS FOR BUILDING AND IMAGE UPLOADING -->
+  <script type="module font-inter">
+    // --- INTEGRACIÓN Y PERSISTENCIA CON FIREBASE FIRESTORE ---
+    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // ✅ CONFIGURACIÓN FIREBASE INTEGRADA DIRECTAMENTE
+    const firebaseConfig = {
+      apiKey: "AIzaSyAl_dFkF1lZ9BLw08tdwSDdrrWzxy8vscg",
+      authDomain: "mci-brochure-manager.firebaseapp.com",
+      projectId: "mci-brochure-manager",
+      storageBucket: "mci-brochure-manager.firebasestorage.app",
+      messagingSenderId: "1723495819",
+      appId: "1:1723495819:web:7f777f737cf59fd06f6b8e"
+    };
+
+    // Variables globales
+    const appId = 'mci-brochure-master-app';
     let db = null;
     let auth = null;
     let firebaseEnabled = false;
 
-    // --- ENLACE DE FUNCIONES INTERACTIVAS DIRECTAMENTE AL OBJETO WINDOW ---
-    // Esto previene fallas de scope en navegadores móviles u offline
+    // Inicializar Firebase automáticamente
+    window.initFirebase = async function(customConfig = null) {
+      try {
+        updateCloudStatus('Conectando...', 'amber');
+        
+        const config = customConfig || firebaseConfig;
+        const app = initializeApp(config);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        firebaseEnabled = true;
 
-    window.toggleSidebar = function() {
+        // Autenticación anónima
+        await signInAnonymously(auth);
+
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            updateCloudStatus('Nube Lista', 'emerald');
+            document.getElementById('save-cloud-btn').removeAttribute('disabled');
+          } else {
+            updateCloudStatus('Sin Sesión', 'red');
+          }
+        });
+      } catch (e) {
+        console.error("Error al conectar con Firebase:", e);
+        updateCloudStatus('Error Config', 'red');
+        showToast('Error al conectar con Firebase.', true);
+      }
+    }
+
+    // Funciones del Formulario del Configurar Firebase de la Barra Lateral
+    window.toggleConfigPanel = function() {
+      const panel = document.getElementById('firebase-config-panel');
+      panel.classList.toggle('hidden');
+      
+      // Auto-completar el textarea si ya hay una configuración guardada
+      const savedConfig = localStorage.getItem('mci_firebase_config');
+      if (savedConfig && !panel.classList.contains('hidden')) {
+        document.getElementById('firebase-json-input').value = savedConfig;
+      }
+    };
+
+    window.saveFirebaseConfig = async function() {
+      showToast('✅ Firebase ya está conectado automáticamente. No necesitas configurar nada.', 'success');
+      document.getElementById('firebase-config-panel').classList.add('hidden');
+    };
+
+    window.clearFirebaseConfig = function() {
+      if (confirm('¿Estás seguro de que deseas desconectar Firebase?')) {
+        location.reload();
+      }
+    };
+
+    // Al cargar la ventana, iniciar autenticación y recuperar plantilla guardada
+    window.onload = async function() {
+      // Pequeño delay para asegurar que QRious está cargado
+      setTimeout(() => {
+        initQR();
+      }, 200);
+      // Conectar Firebase
+      await window.initFirebase();
+    };
+
+    // Actualiza el indicador de conexión de Firebase en el Sidebar
+    function updateCloudStatus(text, color) {
+      const badge = document.getElementById('cloud-status-badge');
+      if (!badge) return;
+      badge.textContent = text;
+      
+      // Remover clases de color previas
+      badge.className = "px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 ";
+      if (color === 'amber') badge.classList.add('bg-amber-500/10', 'text-amber-400');
+      if (color === 'emerald') badge.classList.add('bg-emerald-500/10', 'text-emerald-400');
+      if (color === 'red') badge.classList.add('bg-red-500/10', 'text-red-400');
+      if (color === 'slate') badge.classList.add('bg-slate-500/10', 'text-slate-400');
+    }
+
+    // Cargar contenido sincronizado desde Firestore (REGLAS 1 Y 2)
+    async function loadFromCloud() {
+      if (!db || !auth.currentUser) return;
+      try {
+        // RULE 1: Ruta segura y exclusiva en Firestore
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'drafts', 'main-brochure');
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const cloudData = docSnap.data();
+          if (cloudData && cloudData.htmlContent) {
+            // Restauramos toda la estructura con el contenido guardado por marketing
+            document.getElementById('brochure-pages-container').innerHTML = cloudData.htmlContent;
+            
+            // Re-vincular eventos y refrescar el código QR
+            rebindControls();
+            initQR();
+            showToast('Brochure maestro cargado desde la nube exitosamente.');
+          }
+        }
+      } catch (err) {
+        console.error("Error al cargar datos desde la nube:", err);
+        showToast('Error al descargar la última versión de la nube.', true);
+      }
+    }
+
+    // Guardar cambios a Firestore con protección de contraseña (Clave de Edición: mci2026)
+    window.saveToCloud = async function() {
+      if (!db || !auth.currentUser) {
+        showToast('La conexión con la base de datos no está disponible.', true);
+        return;
+      }
+
+      // Solicitud de código de seguridad para evitar sobreescritura accidental o maliciosa
+      const passcode = prompt("Por favor, ingresa la clave de edición para guardar en la nube (Vercel):");
+      if (passcode !== "mci2026") {
+        if (passcode !== null) {
+          showToast('Clave incorrecta. Los cambios no se han guardado.', true);
+        }
+        return;
+      }
+
+      updateCloudStatus('Guardando...', 'amber');
+      try {
+        // Clonamos el contenedor y removemos barras de control flotantes para almacenar código limpio
+        const pagesContainer = document.getElementById('brochure-pages-container');
+        
+        // RULE 1: Escritura segura en ruta restringida
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'drafts', 'main-brochure');
+        await setDoc(docRef, {
+          htmlContent: pagesContainer.innerHTML,
+          lastUpdated: new Date().toISOString(),
+          updatedBy: auth.currentUser.uid
+        });
+
+        updateCloudStatus('Sincronizado', 'emerald');
+        showToast('¡Plantilla maestra guardada en la nube con éxito!');
+      } catch (err) {
+        console.error("Error al guardar en Firestore:", err);
+        updateCloudStatus('Error al Guardar', 'red');
+        showToast('Ocurrió un error al sincronizar con la nube.', true);
+      }
+    };
+
+    // Re-vincula todos los eventos de edición sobre los bloques dinámicos y cargadores tras refrescar el HTML
+    function rebindControls() {
+      const blocks = document.querySelectorAll('.mci-block');
+      blocks.forEach(block => {
+        // Remover controles anteriores si existen para evitar duplicados
+        const oldControls = block.querySelector('.block-controls');
+        if (oldControls) oldControls.remove();
+        
+        // Inyectar nuevos controles
+        block.insertAdjacentHTML('afterbegin', getControlsHTML());
+      });
+    }
+
+    // Notificaciones toast amigables integradas en la app (no bloqueantes)
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast-notification');
+      const toastMsg = document.getElementById('toast-message');
+      const toastIcon = document.getElementById('toast-icon');
+      
+      if (!toast) return;
+      
+      toastMsg.textContent = message;
+      if (isError) {
+        toastIcon.className = "bg-red-600 text-white p-1.5 rounded-lg font-inter";
+        toastIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation font-inter"></i>`;
+      } else {
+        toastIcon.className = "bg-blue-600 text-white p-1.5 rounded-lg font-inter";
+        toastIcon.innerHTML = `<i class="fa-solid fa-circle-check font-inter"></i>`;
+      }
+      
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4000);
+    }
+
+  </script>
+
+  <!-- SCRIPT GLOBAL PARA QR - FUERA DEL MÓDULO -->
+  <script>
+    // Inicializa o recrea el QR
+    function initQR() {
+      try {
+        const canvas = document.getElementById('qr-canvas');
+        if (!canvas) {
+          console.log("❌ Canvas del QR no encontrado");
+          return;
+        }
+
+        // Si QRious no está listo, reintentar en 100ms
+        if (typeof QRious === 'undefined') {
+          console.log("⏳ QRious no está listo, reintentando...");
+          setTimeout(initQR, 100);
+          return;
+        }
+
+        new QRious({
+          element: canvas,
+          value: 'https://ing.mcielectronics.cl/contacto-2',
+          size: 150,
+          background: 'white',
+          foreground: '#0f172a'
+        });
+        console.log("✅ QR renderizado correctamente");
+      } catch (e) {
+        console.error("❌ Error al renderizar código QR:", e);
+      }
+    }
+
+    // Exponer globalmente
+    window.initQR = initQR;
+  </script>
+
+  <!-- INTERACTIVE JS FOR BUILDING AND IMAGE UPLOADING -->
+  <script>
+    // CONTROL RESPONSIVO DEL SIDEBAR PARA DISPOSITIVOS MÓVILES
+    function toggleSidebar() {
       const sidebar = document.getElementById('page-builder-sidebar');
       const overlay = document.getElementById('sidebar-overlay');
       
@@ -933,9 +1153,22 @@
         overlay.classList.add('hidden');
         document.body.classList.remove('overflow-hidden');
       }
-    };
+    }
 
-    window.scrollToPage = function(pageNumber) {
+    // Generador de Controles de Bloque (Move, Duplicate, Delete)
+    function getControlsHTML() {
+      return `
+        <div class="block-controls absolute -top-3 -right-2 bg-slate-950/95 text-white text-[10px] py-1 px-2.5 rounded-lg shadow-xl flex items-center gap-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-20 no-print border border-slate-800 font-inter">
+          <button onclick="moveBlock(this, 'up')" class="hover:text-sky-400 transition-colors" title="Mover Arriba"><i class="fa-solid fa-arrow-up"></i></button>
+          <button onclick="moveBlock(this, 'down')" class="hover:text-sky-400 transition-colors" title="Mover Abajo"><i class="fa-solid fa-arrow-down"></i></button>
+          <button onclick="duplicateBlock(this)" class="hover:text-emerald-400 transition-colors" title="Duplicar"><i class="fa-solid fa-copy"></i></button>
+          <button onclick="deleteBlock(this)" class="hover:text-red-400 transition-colors" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `;
+    }
+
+    // Desplazamiento rápido entre páginas usando el menú del constructor
+    function scrollToPage(pageNumber) {
       const pageElement = document.getElementById(`brochure-page-${pageNumber}`);
       if (pageElement) {
         pageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -943,16 +1176,18 @@
         // Autocerrar el menú lateral en móviles al navegar
         const sidebar = document.getElementById('page-builder-sidebar');
         if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 1024) {
-          window.toggleSidebar();
+          toggleSidebar();
         }
       }
-    };
+    }
 
-    window.duplicateBlock = function(button) {
+    // Acción: Duplicar Bloque
+    function duplicateBlock(button) {
       const block = button.closest('.mci-block');
       if (!block) return;
       const clone = block.cloneNode(true);
       
+      // Resetea los inputs de archivo locales para evitar errores cruzados
       const fileInput = clone.querySelector('input[type="file"]');
       if (fileInput) fileInput.value = '';
       
@@ -967,17 +1202,20 @@
         placeholder.classList.remove('hidden');
       }
 
+      // Reinserción con animación visual
       block.parentNode.insertBefore(clone, block.nextSibling);
-    };
+    }
 
-    window.deleteBlock = function(button) {
+    // Acción: Eliminar Bloque
+    function deleteBlock(button) {
       const block = button.closest('.mci-block');
       if (block) {
         block.remove();
       }
-    };
+    }
 
-    window.moveBlock = function(button, direction) {
+    // Acción: Reordenar Bloques
+    function moveBlock(button, direction) {
       const block = button.closest('.mci-block');
       if (!block) return;
       const parent = block.parentNode;
@@ -993,9 +1231,10 @@
           parent.insertBefore(next, block);
         }
       }
-    };
+    }
 
-    window.addComponent = function(type) {
+    // Acción: Añadir nuevos componentes en caliente (Modo Page Builder)
+    function addComponent(type) {
       const targetId = document.getElementById('target-page-select').value;
       const targetContainer = document.getElementById(targetId);
       if (!targetContainer) return;
@@ -1011,7 +1250,7 @@
       } else if (type === 'paragraph') {
         html = `
           <div class="mci-block relative group rounded-xl p-2 my-2">
-            <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">Haz doble clic aquí para escribir el nuevo contenido de tu sección o propuesta comercial.</p>
+            <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true font-inter">Haz doble clic aquí para escribir el nuevo contenido de tu sección o propuesta comercial.</p>
           </div>
         `;
       } else if (type === 'card') {
@@ -1038,38 +1277,43 @@
           <div class="mci-block relative group rounded-xl p-2 my-3">
             <div class="w-full h-44 bg-blue-50/40 border border-blue-200/50 rounded-xl relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
               <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
-              <img class="absolute inset-0 w-full h-full object-cover hidden rounded-xl" alt="Gráfico/Imagen">
+              <img class="absolute inset-0 w-full h-full object-cover hidden rounded-xl" alt="Gráfico/Imagen font-inter">
               <div class="image-upload-placeholder-icon text-blue-600 group-hover/img:text-blue-500 transition-colors flex flex-col items-center gap-2">
-                <i class="fa-regular fa-image text-2xl"></i>
-                <span class="text-xs font-semibold">Subir Gráfica o Fotografía</span>
+                <i class="fa-regular fa-image text-2xl font-inter"></i>
+                <span class="text-xs font-semibold font-inter">Subir Gráfica o Fotografía</span>
               </div>
             </div>
           </div>
         `;
       }
       
+      // Convertimos el string HTML a Elemento real para inyectarle la barra de control
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = html.trim();
       const newBlock = tempDiv.firstChild;
-      newBlock.insertAdjacentHTML('afterbegin', window.getControlsHTML());
+      newBlock.insertAdjacentHTML('afterbegin', getControlsHTML());
       
       targetContainer.appendChild(newBlock);
       
+      // Cerrar sidebar en móviles tras agregar componente para visualización despejada
       if (window.innerWidth < 1024) {
-        window.toggleSidebar();
+        toggleSidebar();
       }
 
+      // Auto desplazamiento sutil hacia la sección modificada para confirmar la inserción
       newBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    };
+    }
 
-    window.triggerImageUpload = function(container) {
+    // Acción: Subida de imágenes reactiva
+    function triggerImageUpload(container) {
       const fileInput = container.querySelector('input[type="file"]');
       if (fileInput) {
         fileInput.click();
       }
-    };
+    }
 
-    window.handleImageChange = function(event, inputElement) {
+    // Compresor de imágenes en caliente: Convierte a JPEG de max 500px para almacenamiento Base64 ultra-liviano
+    function handleImageChange(event, inputElement) {
       const file = event.target.files[0];
       if (file) {
         const container = inputElement.parentElement;
@@ -1085,6 +1329,7 @@
               let width = tempImg.width;
               let height = tempImg.height;
               
+              // Dimensión máxima recomendada para mantener el Base64 bajo los 30KB
               const MAX_DIM = 500;
               if (width > height) {
                 if (width > MAX_DIM) {
@@ -1103,6 +1348,7 @@
               const ctx = canvas.getContext('2d');
               ctx.drawImage(tempImg, 0, 0, width, height);
               
+              // Conversión optimizada
               const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
               
               imgElement.src = compressedBase64;
@@ -1120,11 +1366,13 @@
           reader.readAsDataURL(file);
         }
       }
-    };
+    }
 
-    window.downloadEditedHTML = function() {
+    // Acción: Guardar plantilla HTML local (Clona el estado limpio con los Base64 grabados)
+    function downloadEditedHTML() {
       const docClone = document.documentElement.cloneNode(true);
 
+      // Asegurar que en el clon descargable el sidebar comience cerrado y limpio en móviles
       const sidebarClone = docClone.querySelector('#page-builder-sidebar');
       const overlayClone = docClone.querySelector('#sidebar-overlay');
       if (sidebarClone) sidebarClone.classList.add('-translate-x-full');
@@ -1142,288 +1390,7 @@
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    };
-
-    window.getControlsHTML = function() {
-      return `
-        <div class="block-controls absolute -top-3 -right-2 bg-slate-950/95 text-white text-[10px] py-1 px-2.5 rounded-lg shadow-xl flex items-center gap-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-20 no-print border border-slate-800">
-          <button onclick="moveBlock(this, 'up')" class="hover:text-sky-400 transition-colors" title="Mover Arriba"><i class="fa-solid fa-arrow-up"></i></button>
-          <button onclick="moveBlock(this, 'down')" class="hover:text-sky-400 transition-colors" title="Mover Abajo"><i class="fa-solid fa-arrow-down"></i></button>
-          <button onclick="duplicateBlock(this)" class="hover:text-emerald-400 transition-colors" title="Duplicar"><i class="fa-solid fa-copy"></i></button>
-          <button onclick="deleteBlock(this)" class="hover:text-red-400 transition-colors" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      `;
-    };
-
-    // --- INTEGRACIÓN COMPATIBLE CON FIREBASE EN LA NUBE ---
-    window.initFirebase = async function(customConfig = null) {
-      let config = null;
-
-      // 1. Revisar si hay configuración manual guardada localmente
-      const savedConfig = localStorage.getItem('mci_firebase_config');
-      if (savedConfig) {
-        try { config = JSON.parse(savedConfig); } catch (e) {}
-      }
-
-      // 2. Revisar configuración por defecto del entorno
-      if (!config && typeof __firebase_config !== 'undefined' && __firebase_config) {
-        try { config = JSON.parse(__firebase_config); } catch (e) {}
-      }
-
-      // 3. Forzar configuración manual ingresada en caliente
-      if (customConfig) {
-        config = customConfig;
-      }
-
-      // Fallback automático con tus credenciales reales provistas
-      if (!config) {
-        config = {
-          apiKey: "AIzaSyAl_dFkF1lZ9BLw08tdwSDdrrWzxy8vscg",
-          authDomain: "mci-brochure-manager.firebaseapp.com",
-          projectId: "mci-brochure-manager",
-          storageBucket: "mci-brochure-manager.firebasestorage.app",
-          messagingSenderId: "1723495819",
-          appId: "1:1723495819:web:7f777f737cf59fd06f6b8e"
-        };
-      }
-
-      // Si las librerías CDN de Firebase se cargaron y hay configuración, conectamos
-      if (config && typeof firebase !== 'undefined') {
-        try {
-          updateCloudStatus('Conectando...', 'amber');
-          
-          let app;
-          if (firebase.apps.length === 0) {
-            app = firebase.initializeApp(config);
-          } else {
-            app = firebase.app();
-          }
-
-          auth = firebase.auth(app);
-          db = firebase.firestore(app);
-          firebaseEnabled = true;
-
-          // Intento de autenticación anónima para habilitar el guardado
-          try {
-            await auth.signInAnonymously();
-          } catch (authError) {
-            console.warn("Autenticación anónima restringida:", authError);
-            if (authError.code === 'auth/operation-not-allowed') {
-              showToast('Nota: Puedes habilitar "Inicio de sesión anónimo" en la consola de Firebase para mayor control, pero el guardado ya está configurado.', false);
-            }
-          }
-
-          auth.onAuthStateChanged(async (user) => {
-            updateCloudStatus('Nube Lista', 'emerald');
-            document.getElementById('save-cloud-btn').removeAttribute('disabled');
-            await loadFromCloud();
-          });
-        } catch (e) {
-          console.error("Fallo de conexión Firebase:", e);
-          updateCloudStatus('Error Config', 'red');
-          showToast('No se pudo conectar a la base de datos: ' + e.message, true);
-        }
-      } else {
-        updateCloudStatus('Modo Local (Offline)', 'slate');
-      }
-    };
-
-    window.toggleConfigPanel = function() {
-      const panel = document.getElementById('firebase-config-panel');
-      panel.classList.toggle('hidden');
-      
-      const savedConfig = localStorage.getItem('mci_firebase_config');
-      if (savedConfig && !panel.classList.contains('hidden')) {
-        document.getElementById('firebase-json-input').value = savedConfig;
-      }
-    };
-
-    window.saveFirebaseConfig = async function() {
-      const input = document.getElementById('firebase-json-input').value.trim();
-      if (!input) {
-        showToast('El campo de configuración no puede estar vacío.', true);
-        return;
-      }
-
-      try {
-        const keys = ['apiKey', 'authDomain', 'projectId', 'storageBucket', 'messagingSenderId', 'appId'];
-        const parsedConfig = {};
-        
-        keys.forEach(key => {
-          const regex = new RegExp('["\']?' + key + '["\']?\\s*:\\s*["\']([^"\']+)["\']');
-          const match = input.match(regex);
-          if (match) {
-            parsedConfig[key] = match[1];
-          }
-        });
-
-        if (!parsedConfig.apiKey || !parsedConfig.projectId) {
-          throw new Error("Formato de configuración incompleto.");
-        }
-
-        localStorage.setItem('mci_firebase_config', JSON.stringify(parsedConfig));
-        showToast('¡Configuración guardada exitosamente!');
-        
-        document.getElementById('firebase-config-panel').classList.add('hidden');
-        await window.initFirebase(parsedConfig);
-      } catch (err) {
-        console.error("Error al procesar el parser relajado:", err);
-        showToast('No se pudieron extraer las credenciales. Copia el bloque completo de Firebase.', true);
-      }
-    };
-
-    window.clearFirebaseConfig = function() {
-      if (confirm('¿Estás seguro de que deseas eliminar las credenciales de Firebase de este equipo? El brochure volverá a Modo Local.')) {
-        localStorage.removeItem('mci_firebase_config');
-        showToast('Conexión Firebase eliminada.');
-        window.location.reload();
-      }
-    };
-
-    async function loadFromCloud() {
-      if (!db) return;
-      try {
-        // RULE 1: Ruta segura y exclusiva en Firestore
-        const docRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('drafts').doc('main-brochure');
-        const docSnap = await docRef.get();
-
-        if (docSnap.exists) {
-          const cloudData = docSnap.data();
-          if (cloudData && cloudData.htmlContent) {
-            document.getElementById('brochure-pages-container').innerHTML = cloudData.htmlContent;
-            
-            // Re-vincular los controles dinámicos de los bloques cargados
-            const blocks = document.querySelectorAll('.mci-block');
-            blocks.forEach(block => {
-              const oldControls = block.querySelector('.block-controls');
-              if (oldControls) oldControls.remove();
-              block.insertAdjacentHTML('afterbegin', window.getControlsHTML());
-            });
-
-            initQR();
-            showToast('Brochure maestro cargado desde la nube exitosamente.');
-          }
-        }
-      } catch (err) {
-        console.error("Error al cargar datos desde la nube:", err);
-        showToast('No se pudo descargar la última versión de la nube. Comprueba tus reglas de seguridad.', true);
-      }
     }
-
-    window.saveToCloud = async function() {
-      if (!db) {
-        showToast('La conexión con la base de datos no está disponible.', true);
-        return;
-      }
-
-      const passcode = prompt("Por favor, ingresa la clave de edición para guardar en la nube (Vercel):");
-      if (passcode !== "mci2026") {
-        if (passcode !== null) {
-          showToast('Clave incorrecta. Los cambios no se han guardado.', true);
-        }
-        return;
-      }
-
-      updateCloudStatus('Guardando...', 'amber');
-      try {
-        const pagesContainer = document.getElementById('brochure-pages-container');
-        
-        // RULE 1: Ruta segura y exclusiva en Firestore
-        const docRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('drafts').doc('main-brochure');
-        await docRef.set({
-          htmlContent: pagesContainer.innerHTML,
-          lastUpdated: new Date().toISOString()
-        });
-
-        updateCloudStatus('Sincronizado', 'emerald');
-        showToast('¡Plantilla maestra guardada en la nube con éxito!');
-      } catch (err) {
-        console.error("Error al guardar en Firestore:", err);
-        updateCloudStatus('Error al Guardar', 'red');
-        showToast('Ocurrió un error de escritura. Comprueba las Reglas de Firestore.', true);
-      }
-    };
-
-    function updateCloudStatus(text, color) {
-      const badge = document.getElementById('cloud-status-badge');
-      if (!badge) return;
-      badge.textContent = text;
-      
-      badge.className = "px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 ";
-      if (color === 'amber') badge.classList.add('bg-amber-500/10', 'text-amber-400');
-      if (color === 'emerald') badge.classList.add('bg-emerald-500/10', 'text-emerald-400');
-      if (color === 'red') badge.classList.add('bg-red-500/10', 'text-red-400');
-      if (color === 'slate') badge.classList.add('bg-slate-500/10', 'text-slate-400');
-    }
-
-    function showToast(message, isError = false) {
-      const toast = document.getElementById('toast-notification');
-      const toastMsg = document.getElementById('toast-message');
-      const toastIcon = document.getElementById('toast-icon');
-      
-      if (!toast) return;
-      
-      toastMsg.textContent = message;
-      if (isError) {
-        toastIcon.className = "bg-red-600 text-white p-1.5 rounded-lg";
-        toastIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
-      } else {
-        toastIcon.className = "bg-blue-600 text-white p-1.5 rounded-lg";
-        toastIcon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
-      }
-      
-      toast.classList.remove('hidden');
-      setTimeout(() => {
-        toast.classList.add('hidden');
-      }, 5000);
-    }
-
-    function initQR() {
-      try {
-        const canvas = document.getElementById('qr-canvas');
-        if (canvas && typeof QRious !== 'undefined') {
-          new QRious({
-            element: canvas,
-            value: 'https://ing.mcielectronics.cl/contacto-2',
-            size: 150,
-            background: 'white',
-            foreground: '#0f172a'
-          });
-        }
-      } catch (e) {
-        console.error("Error al renderizar código QR:", e);
-      }
-    }
-
-    // --- ASIGNACIÓN DE COMPORTAMIENTOS AL CARGAR EL DOM ---
-    document.addEventListener("DOMContentLoaded", function() {
-      // Eventos del Sidebar
-      document.getElementById('menu-hamburger-btn').addEventListener('click', window.toggleSidebar);
-      document.getElementById('close-sidebar-btn').addEventListener('click', window.toggleSidebar);
-      document.getElementById('sidebar-overlay').addEventListener('click', window.toggleSidebar);
-      
-      // Eventos del Configurador Firebase
-      document.getElementById('toggle-config-btn').addEventListener('click', window.toggleConfigPanel);
-      document.getElementById('connect-firebase-btn').addEventListener('click', window.saveFirebaseConfig);
-      document.getElementById('clear-firebase-btn').addEventListener('click', window.clearFirebaseConfig);
-      
-      // Evento de Sincronizar en la Nube
-      document.getElementById('save-cloud-btn').addEventListener('click', window.saveToCloud);
-
-      // Adjuntar controles visuales a todos los bloques estáticos
-      const blocks = document.querySelectorAll('.mci-block');
-      blocks.forEach(block => {
-        if (!block.querySelector('.block-controls')) {
-          block.insertAdjacentHTML('afterbegin', window.getControlsHTML());
-        }
-      });
-
-      // Dibujar QR
-      initQR();
-
-      // Iniciar conexión Firebase (se conectará automáticamente a tu nube)
-      window.initFirebase();
-    });
   </script>
 </body>
 </html>
