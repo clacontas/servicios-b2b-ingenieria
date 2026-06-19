@@ -24,22 +24,35 @@
       font-family: 'Poppins', sans-serif;
     }
     
-    /* Configuración de tamaño de página A4 para visualización realista */
+    /* CONFIGURACIÓN DE TAMAÑO CARTA (LETTER) PARA PÁGINAS */
     .brochure-page {
-      width: 210mm;
-      min-height: 297mm;
+      width: 100%;
+      max-width: 215.9mm; /* Ancho Carta */
+      min-height: 279.4mm; /* Alto Carta (más corto que A4, evita espacios vacíos) */
       background-color: #ffffff;
       box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
       margin: 2rem auto;
-      padding: 20mm 15mm;
+      padding: 15mm 15mm; /* Padding optimizado para aprovechar mejor el alto */
       position: relative;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       overflow: hidden;
+      box-sizing: border-box;
     }
 
-    /* Estilos específicos para impresión impecable a PDF */
+    /* Adaptación fluida y responsiva para móviles */
+    @media (max-width: 768px) {
+      .brochure-page {
+        width: 95%;
+        min-height: auto;
+        padding: 10mm 6mm;
+        margin: 1rem auto;
+        border-radius: 12px;
+      }
+    }
+
+    /* Estilos específicos para impresión impecable a PDF Carta */
     @media print {
       body {
         background-color: #ffffff;
@@ -50,19 +63,20 @@
         display: none !important;
       }
       .brochure-page {
-        width: 210mm;
-        height: 297mm;
-        min-height: 297mm;
-        box-shadow: none;
+        width: 210mm !important; /* Forzado estricto de ancho de página */
+        height: 297mm !important; /* Ajuste para calzar perfectamente en exportación estándar */
+        min-height: 297mm !important;
+        box-shadow: none !important;
         margin: 0 !important;
-        padding: 20mm 15mm;
+        padding: 18mm 15mm !important;
         page-break-after: always;
         page-break-inside: avoid;
         display: flex !important;
         flex-direction: column !important;
         justify-content: space-between !important;
+        border-radius: 0 !important;
       }
-      /* Ocultar bordes de subida e iconos de placeholder en impresión si están vacíos */
+      /* Ocultar elementos de dropzone vacíos en la impresión final */
       .image-upload-placeholder-icon {
         display: none !important;
       }
@@ -104,16 +118,20 @@
     }
   </style>
 </head>
-<body class="text-slate-800 antialiased">
+<body class="text-slate-800 antialiased overflow-x-hidden">
 
   <!-- CONTENEDOR FLEX PRINCIPAL: SIDEBAR + BROCHURE -->
-  <div class="flex min-h-screen">
+  <div class="flex min-h-screen relative">
 
-    <!-- BARRA LATERAL IZQUIERDA DE HERRAMIENTAS Y CONSTRUCCIÓN (NO SE IMPRIME) -->
-    <div class="w-80 bg-slate-900 text-white p-6 sticky top-0 h-screen overflow-y-auto no-print flex-shrink-0 border-r border-slate-800 shadow-2xl flex flex-col justify-between">
+    <!-- CAPA OSCURA DE FONDO PARA MÓVILES (NO SE IMPRIME) -->
+    <div id="sidebar-overlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-slate-950/60 z-40 lg:hidden no-print transition-opacity duration-300"></div>
+
+    <!-- BARRA LATERAL IZQUIERDA DE HERRAMIENTAS Y CONSTRUCCIÓN (RESPONSIVA & COLAPSABLE) -->
+    <div id="page-builder-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-80 bg-slate-900 text-white p-6 overflow-y-auto no-print border-r border-slate-800 shadow-2xl flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+      
       <div class="space-y-6">
-        <!-- Brand -->
-        <div class="border-b border-slate-800 pb-4">
+        <!-- Brand & Botón Cerrar en Móviles -->
+        <div class="border-b border-slate-800 pb-4 flex items-center justify-between">
           <div class="flex items-center gap-3">
             <div class="bg-blue-600 p-2 rounded-lg">
               <i class="fa-solid fa-cubes text-xl"></i>
@@ -123,6 +141,22 @@
               <p class="text-[10px] text-slate-400">Constructor de Propuestas IoT</p>
             </div>
           </div>
+          <button onclick="toggleSidebar()" class="lg:hidden text-slate-400 hover:text-white p-1 rounded-lg">
+            <i class="fa-solid fa-xmark text-lg"></i>
+          </button>
+        </div>
+
+        <!-- INDICADOR DE ESTADO CLOUD/SINCRONIZACIÓN -->
+        <div class="bg-slate-800/80 rounded-xl p-3 border border-slate-700/50 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-slate-400 font-semibold">Estado de Nube:</span>
+            <span id="cloud-status-badge" class="bg-amber-500/10 text-amber-400 px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wider flex items-center gap-1">
+              <i class="fa-solid fa-circle-notch animate-spin"></i> Conectando...
+            </span>
+          </div>
+          <button id="save-cloud-btn" onclick="saveToCloud()" disabled class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-3 rounded-lg shadow transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
+            <i class="fa-solid fa-cloud-arrow-up"></i> Guardar en Vercel (Nube)
+          </button>
         </div>
 
         <!-- Navegación de Páginas -->
@@ -176,42 +210,55 @@
 
       <!-- Footer del Sidebar con créditos e instrucciones -->
       <div class="border-t border-slate-800 pt-4 mt-6 text-[11px] text-slate-500 space-y-2">
-        <p><i class="fa-solid fa-circle-question mr-1 text-slate-400"></i> Recuerda rellenar todos los textos e imágenes antes de exportar a PDF final.</p>
+        <p><i class="fa-solid fa-circle-question mr-1 text-slate-400"></i> Al terminar tus cambios, pulsa "Guardar Plantilla" para descargar tu archivo HTML.</p>
         <p class="text-[10px] text-slate-600">MCI Electronics © 2026</p>
       </div>
     </div>
 
     <!-- CONTENIDO PRINCIPAL: BROCHURE -->
-    <div class="flex-grow overflow-y-auto bg-slate-100 pb-12">
+    <div class="flex-grow min-w-0 overflow-y-auto bg-slate-100 pb-12">
 
-      <!-- BARRA DE CONTROL SUPERIOR (NO SE IMPRIME) -->
-      <div class="no-print bg-slate-900 text-white py-4 px-6 sticky top-0 z-50 shadow-xl border-b border-slate-800 font-medium">
-        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div class="flex items-center gap-3">
-            <div class="bg-blue-600 p-2 rounded-lg">
+      <!-- BARRA DE CONTROL SUPERIOR (RESPONSIVA) -->
+      <div class="no-print bg-slate-900 text-white py-4 px-4 sm:px-6 sticky top-0 z-40 shadow-xl border-b border-slate-800 font-medium font-inter">
+        <div class="max-w-5xl mx-auto flex items-center justify-between gap-4">
+          
+          <!-- Botón Menú Hamburguesa en Móviles -->
+          <button onclick="toggleSidebar()" class="lg:hidden bg-slate-800 hover:bg-slate-700 border border-slate-700 text-white p-2.5 rounded-lg transition-colors flex items-center justify-center">
+            <i class="fa-solid fa-bars text-base"></i>
+          </button>
+
+          <!-- Logo / Título de la App -->
+          <div class="flex items-center gap-3 mr-auto sm:mr-0">
+            <div class="bg-blue-600 p-2 rounded-lg hidden sm:block">
               <i class="fa-solid fa-file-pdf text-xl"></i>
             </div>
             <div>
-              <h1 class="font-bold text-base leading-tight">MCI Ingeniería - Editor Corporativo</h1>
-              <p class="text-[10px] text-slate-400">Crea propuestas de telemetría a la medida de tu cliente</p>
+              <h1 class="font-bold text-sm sm:text-base leading-tight">MCI Ingeniería - Editor</h1>
+              <p class="text-[9px] sm:text-[10px] text-slate-400 font-medium">Crea propuestas en formato Carta</p>
             </div>
           </div>
           
           <!-- Botones de Acción -->
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 sm:gap-3">
             <!-- Descargar copia HTML con cambios permanentemente guardados -->
-            <button onclick="downloadEditedHTML()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-500 font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-2">
-              <i class="fa-solid fa-code"></i> Guardar Plantilla (HTML)
+            <button onclick="downloadEditedHTML()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-500 font-semibold px-2.5 sm:px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5" title="Guardar cambios en archivo HTML">
+              <i class="fa-solid fa-code"></i> <span class="hidden sm:inline">Guardar Plantilla</span>
             </button>
             <!-- Imprimir/Exportar a PDF -->
-            <button onclick="window.print()" class="bg-gradient-to-r from-blue-500 to-sky-400 hover:from-blue-600 hover:to-sky-500 text-white font-semibold px-5 py-2 rounded-lg shadow-lg transition-all transform hover:-translate-y-0.5 text-xs flex items-center gap-2">
-              <i class="fa-solid fa-file-export"></i> Exportar / Imprimir PDF
+            <button onclick="window.print()" class="bg-gradient-to-r from-blue-500 to-sky-400 hover:from-blue-600 hover:to-sky-500 text-white font-semibold px-3 sm:px-5 py-2 rounded-lg shadow-lg transition-all transform hover:-translate-y-0.5 text-xs flex items-center gap-1.5">
+              <i class="fa-solid fa-file-export"></i> <span>PDF (Carta)</span>
             </button>
           </div>
         </div>
       </div>
 
-      <!-- CONTENEDOR DE PÁGINAS A4 -->
+      <!-- NOTIFICACIÓN DE ÉXITO O ALERTA FLOTANTE EN VIVO (NO SE IMPRIME) -->
+      <div id="toast-notification" class="hidden no-print fixed top-20 right-6 z-50 bg-slate-900 border border-slate-800 text-slate-100 py-3 px-5 rounded-xl shadow-2xl text-xs flex items-center gap-3 animate-bounce">
+        <div id="toast-icon" class="bg-blue-600 text-white p-1.5 rounded-lg"><i class="fa-solid fa-circle-info"></i></div>
+        <p id="toast-message" class="font-semibold"></p>
+      </div>
+
+      <!-- CONTENEDOR DE PÁGINAS FORMATO CARTA -->
       <div id="brochure-pages-container" class="space-y-4">
 
         <!-- ================= PÁGINA 1: PORTADA ================= -->
@@ -250,27 +297,35 @@
               </div>
               <div class="mci-block relative group rounded-xl p-2">
                 <p class="text-slate-300 text-sm leading-relaxed" contenteditable="true">
-                  Optimiza la gestión operacional, asegura la calidad de tus procesos críticos y reduce tus costos mensuales de energía con tecnología inalámbrica de vanguardia.
+                  Optimiza la gestión operacional, asegura la calidad de tus procesos críticos y reduce tus costos de energía con tecnología inalámbrica de vanguardia.
                 </p>
               </div>
             </div>
 
-            <!-- Imagen Portada Principal -->
+            <!-- Imagen Portada Principal con Vector de Telecomunicaciones de Fábrica -->
             <div class="md:col-span-5 flex justify-center">
-              <div class="w-full max-w-[280px] h-[340px] bg-slate-800/40 border-2 border-dashed border-slate-600 hover:border-sky-400 transition-colors rounded-2xl relative overflow-hidden group cursor-pointer flex flex-col justify-center items-center p-4 text-center" onclick="triggerImageUpload(this)">
+              <div class="w-full max-w-[280px] h-[320px] bg-slate-800/40 border border-slate-700/60 rounded-2xl relative overflow-hidden group cursor-pointer flex flex-col justify-center items-center p-4 text-center" onclick="triggerImageUpload(this)">
                 <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                 <img class="absolute inset-0 w-full h-full object-cover hidden rounded-2xl" alt="Portada">
-                <div class="image-upload-placeholder-icon flex flex-col items-center gap-3 text-slate-400 group-hover:text-sky-400 transition-colors">
-                  <i class="fa-regular fa-image text-4xl"></i>
-                  <span class="text-xs font-semibold">Subir Foto de Portada</span>
-                  <p class="text-[9px] text-slate-500 max-w-[180px]">Recomendado: Imagen industrial o tecnológica</p>
+                <!-- SVG de Fábrica Inteligente Integrada -->
+                <div class="image-upload-placeholder-icon flex flex-col items-center gap-3 text-sky-400 group-hover:text-sky-300 transition-colors p-4">
+                  <svg class="w-24 h-24 text-sky-400/90" viewBox="0 0 100 100" fill="currentColor">
+                    <path d="M10,80 L35,80 L35,45 L65,45 L65,80 L90,80 L90,30 L65,10 L10,30 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <circle cx="50" cy="30" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                    <path d="M40,30 L60,30" stroke="currentColor" stroke-width="1.5"/>
+                    <circle cx="25" cy="55" r="5" fill="currentColor"/>
+                    <circle cx="75" cy="55" r="5" fill="currentColor"/>
+                    <path d="M25,55 L50,30 L75,55" stroke="currentColor" stroke-width="1.5" fill="none"/>
+                  </svg>
+                  <span class="text-xs font-semibold text-slate-200">Personalizar Portada</span>
+                  <p class="text-[9px] text-slate-400 max-w-[180px]">Haz clic para subir fotografía real</p>
                 </div>
               </div>
             </div>
           </div>
 
           <!-- Footer Portada / Contacto Rápido -->
-          <div class="border-t border-slate-800/60 pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 z-10">
+          <div class="border-t border-slate-800/60 pt-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 z-10">
             <div>
               <p class="text-xs text-sky-400 uppercase tracking-wider font-semibold" contenteditable="true">Tu aliado confiable en proyectos de ingeniería</p>
               <p class="text-xs text-slate-400 mt-1" contenteditable="true">Construyendo un futuro juntos • Edición 2026</p>
@@ -291,7 +346,7 @@
 
         <!-- ================= PÁGINA 2: TELEMETRÍA EXPLICACIÓN (DIAGRAMA) ================= -->
         <div id="brochure-page-2" class="brochure-page text-slate-800">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
               <span class="text-sm font-extrabold text-slate-900">Soluciones de Telemetría</span>
@@ -300,9 +355,9 @@
           </div>
 
           <!-- Contenido Modificable Página 2 -->
-          <div id="page-2-content" class="my-auto space-y-8">
+          <div id="page-2-content" class="my-auto space-y-6">
             <div class="mci-block relative group rounded-xl p-2 text-center max-w-lg mx-auto">
-              <h2 class="text-2xl font-bold text-slate-900 mb-3" contenteditable="true">¿En qué consiste nuestra solución?</h2>
+              <h2 class="text-2xl font-bold text-slate-900 mb-2" contenteditable="true">¿En qué consiste nuestra solución?</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
                 Establecemos un puente inalámbrico de alta confiabilidad entre las variables críticas de tus operaciones físicas y la toma de decisiones informadas, utilizando tecnología de bajísimo mantenimiento y plataformas en tiempo real.
               </p>
@@ -310,35 +365,35 @@
 
             <!-- Diagrama de Telemetría -->
             <div class="mci-block relative group rounded-xl p-2">
-              <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-inner">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+              <div class="bg-slate-50 border border-slate-100 rounded-2xl p-5 shadow-inner">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4 relative">
                   <!-- Sensor -->
                   <div class="flex flex-col items-center text-center p-4 bg-white rounded-xl shadow-sm relative z-10 border border-slate-200/50">
-                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
                       <i class="fa-solid fa-temperature-half text-xl"></i>
                     </div>
                     <h4 class="font-bold text-xs uppercase text-slate-900 mb-1" contenteditable="true">01. Sensores</h4>
-                    <p class="text-[11px] text-slate-500 mb-2" contenteditable="true">Miden las variables del entorno físico.</p>
+                    <p class="text-[11px] text-slate-500 mb-1" contenteditable="true">Miden las variables del entorno físico.</p>
                     <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full uppercase" contenteditable="true">Hasta 5 años batería</span>
                   </div>
 
                   <!-- Gateway -->
                   <div class="flex flex-col items-center text-center p-4 bg-white rounded-xl shadow-sm relative z-10 border border-slate-200/50">
-                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
                       <i class="fa-solid fa-tower-cell text-xl"></i>
                     </div>
                     <h4 class="font-bold text-xs uppercase text-slate-900 mb-1" contenteditable="true">02. Gateway</h4>
-                    <p class="text-[11px] text-slate-500 mb-2" contenteditable="true">Recibe datos por RF de largo alcance y sube a internet.</p>
+                    <p class="text-[11px] text-slate-500 mb-1" contenteditable="true">Recibe datos por RF de largo alcance y sube a internet.</p>
                     <span class="text-[9px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase" contenteditable="true">Hasta 1 KM / 4G / Eth</span>
                   </div>
 
                   <!-- Servidor MCIIoT -->
                   <div class="flex flex-col items-center text-center p-4 bg-white rounded-xl shadow-sm relative z-10 border border-slate-200/50">
-                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
                       <i class="fa-solid fa-cloud text-xl"></i>
                     </div>
                     <h4 class="font-bold text-xs uppercase text-slate-900 mb-1" contenteditable="true">03. Servidor MCIIoT</h4>
-                    <p class="text-[11px] text-slate-500 mb-2" contenteditable="true">Almacena, despliega y analiza los datos recopilados.</p>
+                    <p class="text-[11px] text-slate-500 mb-1" contenteditable="true">Almacena, despliega y analiza los datos recopilados.</p>
                     <span class="text-[9px] bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded-full uppercase" contenteditable="true">Alertas y Dashboards</span>
                   </div>
 
@@ -348,23 +403,23 @@
             </div>
 
             <!-- Doble Tarjeta Informativa -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
               <div class="mci-block relative group rounded-xl p-2 bg-blue-50/60 border border-blue-100/50">
                 <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase" contenteditable="true"><i class="fa-solid fa-shield-halved mr-1"></i> Resiliencia ante Desconexión</h4>
-                <p class="text-slate-600 text-[11px]" contenteditable="true">
-                  ¿Se cayó el internet? No hay pérdida de datos. Nuestros sensores de última generación guardan la trazabilidad internamente y la retransmiten con marca de tiempo exacta una vez que la red regresa.
+                <p class="text-slate-600 text-[11px] leading-relaxed" contenteditable="true">
+                  ¿Se cayó el internet? No hay pérdida de datos. Nuestros sensores guardan la trazabilidad internamente y la retransmiten con marca de tiempo exacta una vez que la red regresa.
                 </p>
               </div>
               <div class="mci-block relative group rounded-xl p-2 bg-blue-50/60 border border-blue-100/50">
                 <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase" contenteditable="true"><i class="fa-solid fa-network-wired mr-1"></i> Flexibilidad de Plataforma</h4>
-                <p class="text-slate-600 text-[11px]" contenteditable="true">
+                <p class="text-slate-600 text-[11px] leading-relaxed" contenteditable="true">
                   Visualiza en nuestra amigable plataforma en la nube **MCIIoT** o despacha datos directamente a tus propios sistemas locales mediante integraciones API o protocolos industriales de comunicación.
                 </p>
               </div>
             </div>
           </div>
 
-          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 mt-6">
+          <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-[10px] text-slate-400 mt-4">
             <p contenteditable="true">MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
             <p>Página 2</p>
           </div>
@@ -373,7 +428,7 @@
 
         <!-- ================= PÁGINA 3: TEMPERATURA Y HUMEDAD ================= -->
         <div id="brochure-page-3" class="brochure-page text-slate-800">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
               <span class="text-sm font-extrabold text-slate-900">Monitoreo de Condiciones</span>
@@ -382,86 +437,106 @@
           </div>
 
           <!-- Contenido Modificable Página 3 -->
-          <div id="page-3-content" class="my-auto space-y-6">
+          <div id="page-3-content" class="my-auto space-y-4">
             <div class="mci-block relative group rounded-xl p-2">
               <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true">Módulo de Especialidad</span>
-              <h2 class="text-2xl font-bold text-slate-900 mb-2" contenteditable="true">Monitoreo de Temperatura y Humedad</h2>
+              <h2 class="text-2xl font-bold text-slate-900 mb-1" contenteditable="true">Monitoreo de Temperatura y Humedad</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
-                Garantizamos la seguridad, trazabilidad y máxima calidad en la cadena de frío. Automatiza el control en tus bodegas, laboratorios y logística de tránsito mediante alertas inteligentes instantáneas.
+                Garantizamos la seguridad y máxima calidad en la cadena de frío. Automatiza el control en tus bodegas, laboratorios y logística de tránsito mediante alertas inteligentes instantáneas.
               </p>
             </div>
 
-            <!-- Grid de Sensores (Cada uno es un mci-block independiente) -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Grid de Sensores (Con vectores SVG por defecto que simulan cada equipo) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               
               <!-- Sonoff -->
-              <div class="mci-block relative group p-3 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
-                <div class="w-20 h-20 bg-slate-200 border border-slate-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+              <div class="mci-block relative group p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
+                <div class="w-16 h-16 bg-blue-50 border border-blue-200 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Sonoff">
-                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
-                    <i class="fa-solid fa-house-laptop text-base"></i>
-                    <span class="text-[8px] font-bold mt-1">FOTO</span>
+                  <!-- SVG Pre-cargado de Sonoff TH -->
+                  <div class="image-upload-placeholder-icon text-blue-600 group-hover/img:text-blue-500 transition-colors flex flex-col items-center">
+                    <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="5" y="3" width="14" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                      <rect x="8" y="6" width="8" height="6" rx="1" fill="currentColor" opacity="0.3"/>
+                      <circle cx="12" cy="16" r="2" fill="currentColor"/>
+                    </svg>
+                    <span class="text-[6px] font-extrabold uppercase mt-1">VER DISPOSITIVO</span>
                   </div>
                 </div>
                 <div class="flex-grow">
                   <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">01. Sonoff TH Elite</h4>
-                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
-                    Controlador ideal para hogares y oficinas con pantalla de estado en vivo. Permite automatizar sistemas de climatización local de manera económica e integrada.
+                  <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
+                    Controlador inteligente para interiores con pantalla LCD. Automatiza y regula sistemas de climatización de forma ágil y económica.
                   </p>
                 </div>
               </div>
 
               <!-- Teltonika -->
-              <div class="mci-block relative group p-3 bg-sky-50 rounded-xl border border-sky-100 flex gap-3 items-center">
-                <div class="w-20 h-20 bg-sky-200/50 border border-sky-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+              <div class="mci-block relative group p-2.5 bg-sky-50 rounded-xl border border-sky-100 flex gap-3 items-center">
+                <div class="w-16 h-16 bg-sky-100/50 border border-sky-200 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Teltonika">
-                  <div class="image-upload-placeholder-icon text-sky-600 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
-                    <i class="fa-solid fa-bluetooth text-base"></i>
-                    <span class="text-[8px] font-bold mt-1">FOTO</span>
+                  <!-- SVG Pre-cargado de Teltonika EYE Sensor -->
+                  <div class="image-upload-placeholder-icon text-sky-600 group-hover/img:text-sky-500 transition-colors flex flex-col items-center">
+                    <svg class="w-8 h-8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <circle cx="12" cy="12" r="9" fill="currentColor" fill-opacity="0.1"/>
+                      <path d="M12,6 L12,18 M6,12 L18,12" stroke-dasharray="2 2"/>
+                      <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                    </svg>
+                    <span class="text-[6px] font-extrabold uppercase mt-1">TECNOLOGÍA BLE</span>
                   </div>
                 </div>
                 <div class="flex-grow">
                   <h4 class="font-bold text-xs uppercase text-blue-900" contenteditable="true">02. Teltonika EYE Sensor</h4>
-                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
-                    Sensor inalámbrico ultra-robusto IP67 (Bluetooth BLE). Se enlaza con gateways de transporte para auditar la cadena de frío en ruta.
+                  <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
+                    Baliza Bluetooth (BLE) ultra-robusta e impermeable IP67. Se vincula con gateways móviles para auditar la temperatura en ruta de despacho.
                   </p>
                 </div>
               </div>
 
               <!-- iButton -->
-              <div class="mci-block relative group p-3 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
-                <div class="w-20 h-20 bg-slate-200 border border-slate-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+              <div class="mci-block relative group p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
+                <div class="w-16 h-16 bg-slate-200 border border-slate-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="iButton">
-                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
-                    <i class="fa-solid fa-circle-dot text-base"></i>
-                    <span class="text-[8px] font-bold mt-1">FOTO</span>
+                  <!-- SVG Pre-cargado de iButton -->
+                  <div class="image-upload-placeholder-icon text-slate-600 group-hover/img:text-slate-500 transition-colors flex flex-col items-center">
+                    <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                      <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
+                      <circle cx="12" cy="12" r="6" fill="currentColor" opacity="0.4"/>
+                      <circle cx="12" cy="12" r="3" fill="currentColor"/>
+                    </svg>
+                    <span class="text-[6px] font-extrabold uppercase mt-1">IBUTTON DISK</span>
                   </div>
                 </div>
                 <div class="flex-grow">
                   <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">03. iButton Data Loggers</h4>
-                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
-                    Dispositivo de contacto metálico autónomo con memoria integrada. Ideal para auditorías estrictas directamente dentro de cajas térmicas de fármacos.
+                  <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
+                    Contacto metálico encapsulado autónomo. Registra el historial de temperatura internamente en cajas térmicas de distribución.
                   </p>
                 </div>
               </div>
 
               <!-- Milesight -->
-              <div class="mci-block relative group p-3 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
-                <div class="w-20 h-20 bg-slate-200 border border-slate-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+              <div class="mci-block relative group p-2.5 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
+                <div class="w-16 h-16 bg-blue-50 border border-blue-200 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Milesight">
-                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
-                    <i class="fa-solid fa-wifi text-base"></i>
-                    <span class="text-[8px] font-bold mt-1">FOTO</span>
+                  <!-- SVG Pre-cargado de Milesight EM300 -->
+                  <div class="image-upload-placeholder-icon text-blue-600 group-hover/img:text-blue-500 transition-colors flex flex-col items-center">
+                    <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="6" y="6" width="12" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                      <path d="M12,2 L12,6" stroke="currentColor" stroke-width="2"/>
+                      <rect x="9" y="10" width="6" height="4" fill="currentColor" opacity="0.3"/>
+                    </svg>
+                    <span class="text-[6px] font-extrabold uppercase mt-1">LORA INDUSTRIAL</span>
                   </div>
                 </div>
                 <div class="flex-grow">
-                  <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">04. Milesight TS301 / EM300</h4>
-                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
-                    Tecnología industrial LoRaWAN de largo alcance. Diseñado con baterías de altísima duración para monitoreo de laboratorios y cámaras industriales.
+                  <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">04. Milesight TS301</h4>
+                  <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
+                    Sonda LoRaWAN de nivel industrial. Coberturas excepcionales y baterías de hasta 5 años para grandes laboratorios o cámaras de frío.
                   </p>
                 </div>
               </div>
@@ -471,38 +546,42 @@
             <!-- Caso de éxito (Temperatura y Humedad - Anonimizado para cumplir NT 147 ISP) -->
             <div class="mci-block relative group rounded-xl p-2 border border-slate-100 bg-slate-50/60">
               <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                <div class="md:col-span-8">
-                  <h4 class="font-bold text-xs text-blue-900 mb-2 uppercase" contenteditable="true"><i class="fa-solid fa-file-shield mr-1"></i> Caso de Éxito: Cumplimiento de Normativa Sanitaria (NT 147 ISP)</h4>
-                  <p class="text-[11px] text-slate-600 leading-relaxed" contenteditable="true">
-                    Diseñamos e implementamos un sistema de telemetría IoT de alta precisión para una destacada empresa líder en logística y distribución farmacéutica. Integramos gateways industriales **Milesight UG65** con una red de sensores inalámbricos de temperatura y humedad distribuidos por toda la bodega. Los datos se transmiten encriptados en tiempo real a la plataforma **MCIIoT**, automatizando la entrega de informes semanales requeridos y activando alertas inmediatas vía correo electrónico y Telegram ante cualquier desviación térmica, garantizando el cumplimiento riguroso de la norma NT 147 del Instituto de Salud Pública (ISP) de Chile y asegurando la continuidad operativa del centro.
+                <div class="md:col-span-9">
+                  <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase" contenteditable="true"><i class="fa-solid fa-file-shield mr-1"></i> Caso de Éxito: Cumplimiento de Normativa Sanitaria (NT 147 ISP)</h4>
+                  <p class="text-[10px] text-slate-600 leading-relaxed" contenteditable="true">
+                    Diseñamos e implementamos un sistema de telemetría IoT de alta precisión para una destacada empresa líder en logística farmacéutica. Integramos gateways industriales **Milesight UG65** con una red de sensores inalámbricos de temperatura y humedad distribuidos en bodega. Los datos se transmiten encriptados en tiempo real a **MCIIoT**, automatizando la entrega de informes semanales y activando alertas inmediatas vía correo electrónico y Telegram ante cualquier desviación térmica, garantizando el cumplimiento de la norma NT 147 del ISP de Chile y asegurando la continuidad operativa del centro.
                   </p>
                 </div>
-                <div class="md:col-span-4 h-28 bg-slate-200 border border-slate-300 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                <div class="md:col-span-3 h-24 bg-blue-50 border border-blue-200 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Bodega Fármacos">
-                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center gap-1 text-[10px] font-semibold p-2">
-                    <i class="fa-regular fa-image text-lg"></i>
-                    <span>Foto de Bodega o Dashboard</span>
+                  <!-- SVG Pre-cargado de Bodega Segura NT147 -->
+                  <div class="image-upload-placeholder-icon text-blue-600 group-hover/img:text-blue-500 transition-colors flex flex-col items-center p-2 text-center">
+                    <svg class="w-10 h-10 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M3,9 L12,2 L21,9 L21,20 L3,21 Z" fill="currentColor" fill-opacity="0.1"/>
+                      <path d="M12,11 L12,17 M9,14 L15,14" stroke="currentColor" stroke-width="2.5"/>
+                    </svg>
+                    <span class="text-[7px] font-extrabold uppercase mt-1">BODEGA SANITARIA</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- CTA de Alertas -->
-            <div class="mci-block relative group rounded-xl p-2">
-              <div class="bg-slate-900 text-white rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+            <div class="mci-block relative group rounded-xl p-1">
+              <div class="bg-slate-900 text-white rounded-xl p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div class="max-w-md">
                   <h4 class="font-bold text-xs uppercase text-sky-400" contenteditable="true">¿Sufres pérdidas por fallas en climatización?</h4>
-                  <p class="text-[10px] text-slate-300 mt-1" contenteditable="true">
-                    Configura alertas inmediatas y personalizadas a tus equipos de trabajo vía Telegram, Correo Electrónico o llamadas automáticas ante cualquier quiebre imprevisto en los umbrales configurados.
+                  <p class="text-[9px] text-slate-300 mt-0.5" contenteditable="true">
+                    Configura alertas inmediatas a tus equipos vía Telegram, Correo o llamada ante cualquier quiebre térmico.
                   </p>
                 </div>
-                <a href="mailto:ingenieria@mcielectronics.cl" class="bg-blue-600 text-white font-bold text-xs px-3 py-2 rounded shadow hover:bg-blue-700 transition-colors whitespace-nowrap text-center" contenteditable="true">Saber Más</a>
+                <a href="mailto:ingenieria@mcielectronics.cl" class="bg-blue-600 text-white font-bold text-xs px-3 py-1.5 rounded shadow hover:bg-blue-700 transition-colors whitespace-nowrap text-center" contenteditable="true">Saber Más</a>
               </div>
             </div>
           </div>
 
-          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 mt-6">
+          <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-[10px] text-slate-400 mt-4">
             <p contenteditable="true">MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
             <p>Página 3</p>
           </div>
@@ -511,7 +590,7 @@
 
         <!-- ================= PÁGINA 4: CONSUMO ENERGÉTICO ================= -->
         <div id="brochure-page-4" class="brochure-page text-slate-800">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
               <span class="text-sm font-extrabold text-slate-900">Eficiencia Energética</span>
@@ -520,45 +599,51 @@
           </div>
 
           <!-- Contenido Modificable Página 4 -->
-          <div id="page-4-content" class="my-auto space-y-6">
+          <div id="page-4-content" class="my-auto space-y-4">
             <div class="mci-block relative group rounded-xl p-2">
               <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true">Gestión de Consumos</span>
-              <h2 class="text-2xl font-bold text-slate-900 mb-2" contenteditable="true">Monitoreo de Consumo Energético</h2>
+              <h2 class="text-2xl font-bold text-slate-900 mb-1" contenteditable="true">Monitoreo de Consumo Energético</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
-                Toma el control absoluto del gasto eléctrico de tu negocio o industria. Nuestras tecnologías te permiten mapear en tiempo real los consumos, optimizar el uso de tus recursos y cumplir con las normativas energéticas del país.
+                Toma el control absoluto del gasto eléctrico de tu negocio. Nuestras tecnologías te permiten mapear en tiempo real los consumos, optimizar el uso de tus recursos y cumplir con las normativas del país.
               </p>
             </div>
 
             <!-- Ley de Eficiencia -->
             <div class="mci-block relative group rounded-xl p-2">
-              <div class="bg-gradient-to-r from-blue-900 to-slate-900 text-white p-4 rounded-xl flex items-center gap-4 border-l-4 border-sky-400">
-                <div class="bg-sky-500/15 p-2 rounded-lg text-sky-400 text-xl hidden sm:block">
+              <div class="bg-gradient-to-r from-blue-900 to-slate-900 text-white p-3 rounded-xl flex items-center gap-3 border-l-4 border-sky-400">
+                <div class="bg-sky-500/15 p-2 rounded-lg text-sky-400 text-lg hidden sm:block">
                   <i class="fa-solid fa-gavel"></i>
                 </div>
                 <div class="text-xs">
-                  <h4 class="font-bold uppercase text-sky-400 mb-1" contenteditable="true">Ley de Eficiencia Energética (Ley 21.305)</h4>
-                  <p class="text-slate-300 text-[10px]" contenteditable="true">
-                    ¿Sabías que en Chile las grandes empresas deben implementar sistemas de gestión y reportar sus consumos de energía e intensidad al Ministerio? En MCI implementamos sistemas homologados listos para reportar de forma simple.
+                  <h4 class="font-bold uppercase text-sky-400 mb-0.5" contenteditable="true">Ley de Eficiencia Energética (Ley 21.305)</h4>
+                  <p class="text-slate-300 text-[10px] leading-relaxed" contenteditable="true">
+                    En Chile las grandes empresas deben implementar sistemas de gestión y reportar sus consumos de energía e intensidad al Ministerio. En MCI implementamos sistemas homologados listos para reportar.
                   </p>
                 </div>
               </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
               <!-- Monitoreo No Invasivo -->
               <div class="mci-block relative group rounded-xl p-3 bg-slate-50 border border-slate-100 flex flex-col justify-between">
                 <div>
-                  <h4 class="font-bold text-xs uppercase text-slate-900 mb-2" contenteditable="true"><i class="fa-solid fa-gauge-high mr-1 text-blue-600"></i> Medición Sin Intervención</h4>
-                  <p class="text-[11px] text-slate-600 mb-3" contenteditable="true">
-                    Instalamos sensores de corriente autoalimentados de pinza abierta **Milesight CT101/CT103**. Monitorea el consumo de tus tableros o maquinarias críticas sin necesidad de cortar el suministro ni interrumpir tu proceso productivo.
+                  <h4 class="font-bold text-xs uppercase text-slate-900 mb-1" contenteditable="true"><i class="fa-solid fa-gauge-high mr-1 text-blue-600"></i> Medición Sin Intervención</h4>
+                  <p class="text-[10px] text-slate-600 mb-2 leading-relaxed" contenteditable="true">
+                    Instalamos sensores de corriente de pinza abierta **Milesight CT101/CT103**. Monitorea el consumo de tableros sin cortar suministro ni detener procesos.
                   </p>
                 </div>
-                <div class="w-full h-24 bg-slate-200 border border-slate-300 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                <div class="w-full h-20 bg-blue-50 border border-blue-100 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Tablero">
-                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex items-center gap-2 text-xs font-semibold">
-                    <i class="fa-regular fa-image"></i>
-                    <span>Foto de Tablero</span>
+                  <!-- SVG de Pinza CT y Tablero Eléctrico -->
+                  <div class="image-upload-placeholder-icon text-blue-600 group-hover/img:text-blue-500 transition-colors flex items-center justify-center gap-2 text-[10px] font-semibold">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="currentColor">
+                      <rect x="4" y="3" width="16" height="18" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>
+                      <line x1="12" y1="3" x2="12" y2="21" stroke="currentColor" stroke-dasharray="2 2"/>
+                      <circle cx="8" cy="12" r="2" fill="currentColor"/>
+                      <circle cx="16" cy="12" r="2" fill="currentColor"/>
+                    </svg>
+                    <span>MONITOREO DE TABLERO</span>
                   </div>
                 </div>
               </div>
@@ -566,17 +651,22 @@
               <!-- Control de Oficinas -->
               <div class="mci-block relative group rounded-xl p-3 bg-slate-50 border border-slate-100 flex flex-col justify-between">
                 <div>
-                  <h4 class="font-bold text-xs uppercase text-slate-900 mb-2" contenteditable="true"><i class="fa-solid fa-building-circle-check mr-1 text-blue-600"></i> Edificios Inteligentes</h4>
-                  <p class="text-[11px] text-slate-600 mb-3" contenteditable="true">
-                    Optimiza el consumo en iluminación y climatización (HVAC) acoplando sensores PIR, detectores de ocupación y enchufes inteligentes LoRaWAN. Enciende o apaga la luz y el aire acondicionado basándote únicamente en el uso real de las salas.
+                  <h4 class="font-bold text-xs uppercase text-slate-900 mb-1" contenteditable="true"><i class="fa-solid fa-building-circle-check mr-1 text-blue-600"></i> Edificios Inteligentes</h4>
+                  <p class="text-[10px] text-slate-600 mb-2 leading-relaxed" contenteditable="true">
+                    Optimiza climatización (HVAC) acoplando sensores PIR, presencia y enchufes inteligentes LoRaWAN para cortes automatizados en horarios inhabiles.
                   </p>
                 </div>
-                <div class="w-full h-24 bg-slate-200 border border-slate-300 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                <div class="w-full h-20 bg-blue-50 border border-blue-100 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Edificio">
-                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex items-center gap-2 text-xs font-semibold">
-                    <i class="fa-regular fa-image"></i>
-                    <span>Foto de Oficina / Sensores</span>
+                  <!-- SVG de Automatización de Climatización de Oficinas -->
+                  <div class="image-upload-placeholder-icon text-blue-600 group-hover/img:text-blue-500 transition-colors flex items-center justify-center gap-2 text-[10px] font-semibold">
+                    <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="18" rx="2" fill="currentColor" fill-opacity="0.1"/>
+                      <path d="M9,21 V10 H15 V21" stroke="currentColor"/>
+                      <circle cx="12" cy="7" r="1.5" fill="currentColor"/>
+                    </svg>
+                    <span>CLIMATIZACIÓN INTELIGENTE</span>
                   </div>
                 </div>
               </div>
@@ -585,25 +675,32 @@
             <!-- Caso de éxito -->
             <div class="mci-block relative group rounded-xl p-2 border border-slate-100 bg-slate-50/60">
               <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                <div class="md:col-span-8">
-                  <h4 class="font-bold text-xs text-blue-900 mb-2 uppercase" contenteditable="true"><i class="fa-solid fa-solar-panel mr-1"></i> Caso de Éxito: Telemetría en Planta Solar</h4>
-                  <p class="text-[11px] text-slate-600 leading-relaxed" contenteditable="true">
-                    Desarrollamos e integramos con éxito un sistema de medición energética en faenas de generación solar. El sistema extrae datos de generación directamente desde inversores industriales mediante protocolo Modbus TCP, transmitiéndolos vía celular (3G/4G) a la nube **MCIIoT** para visualizar la inyección y diagnosticar caídas de inversores de forma remota.
+                <div class="md:col-span-9">
+                  <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase" contenteditable="true"><i class="fa-solid fa-solar-panel mr-1"></i> Caso de Éxito: Telemetría en Planta Solar</h4>
+                  <p class="text-[10px] text-slate-600 leading-relaxed" contenteditable="true">
+                    Desarrollamos e integramos con éxito un sistema de medición energética en generación solar. Extraemos datos directamente de los inversores mediante protocolo Modbus TCP, transmitiéndolos vía celular (3G/4G) a nuestra nube **MCIIoT** para visualizar la generación en tiempo real y diagnosticar caídas remotamente.
                   </p>
                 </div>
-                <div class="md:col-span-4 h-28 bg-slate-200 border border-slate-300 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                <div class="md:col-span-3 h-24 bg-blue-50 border border-blue-200 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Planta Solar">
-                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center gap-1 text-[10px] font-semibold p-2">
-                    <i class="fa-regular fa-image text-lg"></i>
-                    <span>Foto Planta Solar</span>
+                  <!-- SVG de Planta Solar Pre-cargada -->
+                  <div class="image-upload-placeholder-icon text-blue-600 group-hover/img:text-blue-500 transition-colors flex flex-col items-center p-1 text-center">
+                    <svg class="w-10 h-10 text-blue-600" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <rect x="3" y="3" width="18" height="12" rx="1" fill="currentColor" fill-opacity="0.1"/>
+                      <line x1="3" y1="9" x2="21" y2="9"/>
+                      <line x1="9" y1="3" x2="9" y2="15"/>
+                      <line x1="15" y1="3" x2="15" y2="15"/>
+                      <path d="M12,15 L12,21 M8,21 L16,21" stroke="currentColor" stroke-width="1.5"/>
+                    </svg>
+                    <span class="text-[7px] font-extrabold uppercase mt-1">PLANTA SOLAR</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 mt-6">
+          <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-[10px] text-slate-400 mt-4">
             <p contenteditable="true">MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
             <p>Página 4</p>
           </div>
@@ -612,7 +709,7 @@
 
         <!-- ================= PÁGINA 5: COMPLEMENTARIO ================= -->
         <div id="brochure-page-5" class="brochure-page text-slate-800">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
               <span class="text-sm font-extrabold text-slate-900">Ecosistema Complementario</span>
@@ -623,9 +720,9 @@
           <!-- Contenido Modificable Página 5 -->
           <div id="page-5-content" class="my-auto space-y-6">
             <div class="mci-block relative group rounded-xl p-2 text-center max-w-lg mx-auto">
-              <h2 class="text-xl font-bold text-slate-900 mb-2" contenteditable="true">Ecosistema de Soluciones IoT e Ingeniería</h2>
+              <h2 class="text-xl font-bold text-slate-900 mb-1" contenteditable="true">Ecosistema de Soluciones IoT e Ingeniería</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
-                Nuestra plataforma **MCIIoT** es versátil. Expandimos el poder de tu infraestructura de telemetría agregando de manera sencilla sensores de especialidad complementaria para resolver otras necesidades clave.
+                Nuestra plataforma **MCIIoT** es versátil. Expandimos el poder de tu infraestructura agregando sensores de especialidad complementaria para resolver otras necesidades operacionales clave.
               </p>
             </div>
 
@@ -636,8 +733,8 @@
                 <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-droplet"></i></div>
                 <div>
                   <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">Control de Recursos Hídricos</h4>
-                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
-                    Monitoreo continuo de flujo en sistemas de riego, niveles de agua en estanques de acumulación mediante ultrasonido y detección de fugas en salas de bombas críticas.
+                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
+                    Monitoreo continuo de flujo en sistemas de riego, niveles de agua en estanques mediante ultrasonido y detección de fugas en salas de bombas críticas.
                   </p>
                 </div>
               </div>
@@ -647,8 +744,8 @@
                 <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-wind"></i></div>
                 <div>
                   <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">Calidad Medioambiental (CO2 / UV)</h4>
-                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
-                    Protección de colaboradores en exteriores mediante sensores de radiación UV y monitoreo de CO2 y ventilación en salones de clases u oficinas para garantizar espacios de alta concentración.
+                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
+                    Protección de colaboradores en exteriores mediante sensores de radiación UV y monitoreo de CO2 y ventilación en oficinas y salas de clases.
                   </p>
                 </div>
               </div>
@@ -658,8 +755,8 @@
                 <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-people-group"></i></div>
                 <div>
                   <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">Flujo de Personas y Activos</h4>
-                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
-                    Analiza el tráfico real de clientes en tiendas de retail para planificar turnos, optimizar el uso de salas corporativas o medir la tasa de ocupación en estacionamientos vehiculares.
+                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
+                    Analiza el tráfico de clientes en retail, optimiza el uso de salas corporativas o mide la tasa de ocupación de vehículos en estacionamientos.
                   </p>
                 </div>
               </div>
@@ -669,8 +766,8 @@
                 <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-microchip"></i></div>
                 <div>
                   <h4 class="font-bold text-xs uppercase text-blue-900" contenteditable="true">Diseño Electrónico e Integración</h4>
-                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
-                    Somos fabricantes. Ofrecemos diseño de circuitos impresos (PCB), programación de firmware a medida, integración de tableros eléctricos con PLCs industriales multimarca y puestas en marcha completas en terreno.
+                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
+                    Somos fabricantes. Ofrecemos diseño de circuitos impresos (PCB), programación de firmware a medida, integración de tableros eléctricos y puestas en marcha.
                   </p>
                 </div>
               </div>
@@ -678,7 +775,7 @@
             </div>
           </div>
 
-          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 mt-6">
+          <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-[10px] text-slate-400 mt-4">
             <p contenteditable="true">MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
             <p>Página 5</p>
           </div>
@@ -687,7 +784,7 @@
 
         <!-- ================= PÁGINA 6: METODOLOGÍA Y CIERRE ================= -->
         <div id="brochure-page-6" class="brochure-page text-slate-800">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
               <span class="text-sm font-extrabold text-slate-900">Contacto y Metodología</span>
@@ -738,9 +835,12 @@
                 <div class="w-24 h-24 bg-slate-800 border border-slate-700 rounded-full relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center flex-shrink-0" onclick="triggerImageUpload(this)">
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-full" alt="Ejecutivo de Cuentas">
+                  <!-- SVG Pre-cargado de Foto Ejecutivo -->
                   <div class="image-upload-placeholder-icon text-slate-400 group-hover/img:text-sky-400 transition-colors flex flex-col items-center p-1">
-                    <i class="fa-solid fa-user-tie text-xl"></i>
-                    <span class="text-[7px] font-bold mt-1">FOTO EJECUTIVO</span>
+                    <svg class="w-12 h-12" viewBox="0 0 24 24" fill="currentColor">
+                      <path d="M12,2 C13.66,2 15,3.34 15,5 C15,6.66 13.66,8 12,8 C10.34,8 9,6.66 9,5 C9,3.34 10.34,2 12,2 Z M12,10 C16.42,10 20,12.24 20,15 L20,17 L4,17 L4,15 C4,12.24 7.58,10 12,10 Z"/>
+                    </svg>
+                    <span class="text-[7px] font-bold mt-1">FOTO COMERCIAL</span>
                   </div>
                 </div>
 
@@ -777,7 +877,7 @@
 
           </div>
 
-          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 mt-6">
+          <div class="border-t border-slate-100 pt-3 flex justify-between items-center text-[10px] text-slate-400 mt-4">
             <p contenteditable="true">MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
             <p>Página 6</p>
           </div>
@@ -788,9 +888,217 @@
   </div>
 
   <!-- INTERACTIVE JS FOR BUILDING AND IMAGE UPLOADING -->
+  <script type="module">
+    // --- INTEGRACIÓN Y PERSISTENCIA CON FIREBASE FIRESTORE ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+    // Variables globales de entorno provistas por Vercel / Canvas
+    const appId = typeof __app_id !== 'undefined' ? __app_id : 'mci-brochure-master-app';
+    let db = null;
+    let auth = null;
+    let firebaseEnabled = false;
+
+    // Inicialización segura de Firebase
+    if (typeof __firebase_config !== 'undefined' && __firebase_config) {
+      try {
+        const firebaseConfig = JSON.parse(__firebase_config);
+        const app = initializeApp(firebaseConfig);
+        auth = getAuth(app);
+        db = getFirestore(app);
+        firebaseEnabled = true;
+      } catch (e) {
+        console.error("Error al inicializar los servicios de Firebase:", e);
+      }
+    }
+
+    // Al cargar la ventana, iniciar autenticación y recuperar plantilla guardada
+    window.onload = async function() {
+      // 1. Inicializar QR interactivo
+      initQR();
+
+      if (firebaseEnabled) {
+        updateCloudStatus('Conectando...', 'amber');
+        try {
+          // RULE 3: Autenticación obligatoria antes de cualquier consulta Firestore
+          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+            await signInWithCustomToken(auth, __initial_auth_token);
+          } else {
+            await signInAnonymously(auth);
+          }
+
+          onAuthStateChanged(auth, async (user) => {
+            if (user) {
+              updateCloudStatus('Nube Lista', 'emerald');
+              document.getElementById('save-cloud-btn').removeAttribute('disabled');
+              // Descargar la última copia del brochure desde la nube
+              await loadFromCloud();
+            } else {
+              updateCloudStatus('Sin Sesión', 'red');
+            }
+          });
+        } catch (error) {
+          console.error("Error de conexión a la nube:", error);
+          updateCloudStatus('Error Nube', 'red');
+        }
+      } else {
+        updateCloudStatus('Modo Local (Offline)', 'slate');
+      }
+    };
+
+    // Actualiza el indicador de conexión de Firebase en el Sidebar
+    function updateCloudStatus(text, color) {
+      const badge = document.getElementById('cloud-status-badge');
+      if (!badge) return;
+      badge.textContent = text;
+      
+      // Remover clases de color previas
+      badge.className = "px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 ";
+      if (color === 'amber') badge.classList.add('bg-amber-500/10', 'text-amber-400');
+      if (color === 'emerald') badge.classList.add('bg-emerald-500/10', 'text-emerald-400');
+      if (color === 'red') badge.classList.add('bg-red-500/10', 'text-red-400');
+      if (color === 'slate') badge.classList.add('bg-slate-500/10', 'text-slate-400');
+    }
+
+    // Cargar contenido sincronizado desde Firestore (REGLAS 1 Y 2)
+    async function loadFromCloud() {
+      if (!db || !auth.currentUser) return;
+      try {
+        // RULE 1: Ruta segura y exclusiva en Firestore
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'drafts', 'main-brochure');
+        const docSnap = await getDoc(docRef);
+
+        if (docSnap.exists()) {
+          const cloudData = docSnap.data();
+          if (cloudData && cloudData.htmlContent) {
+            // Restauramos toda la estructura con el contenido guardado por marketing
+            document.getElementById('brochure-pages-container').innerHTML = cloudData.htmlContent;
+            
+            // Re-vincular eventos y refrescar el código QR
+            rebindControls();
+            initQR();
+            showToast('Brochure maestro cargado desde la nube exitosamente.');
+          }
+        }
+      } catch (err) {
+        console.error("Error al cargar datos desde la nube:", err);
+        showToast('Error al descargar la última versión de la nube.', true);
+      }
+    }
+
+    // Guardar cambios a Firestore con protección de contraseña (Clave de Edición: mci2026)
+    window.saveToCloud = async function() {
+      if (!db || !auth.currentUser) {
+        showToast('La conexión con la base de datos no está disponible.', true);
+        return;
+      }
+
+      // Solicitud de código de seguridad para evitar sobreescritura accidental o maliciosa
+      const passcode = prompt("Por favor, ingresa la clave de edición para guardar en la nube (Vercel):");
+      if (passcode !== "mci2026") {
+        if (passcode !== null) {
+          showToast('Clave incorrecta. Los cambios no se han guardado.', true);
+        }
+        return;
+      }
+
+      updateCloudStatus('Guardando...', 'amber');
+      try {
+        // Clonamos el contenedor y removemos barras de control flotantes para almacenar código limpio
+        const pagesContainer = document.getElementById('brochure-pages-container');
+        
+        // RULE 1: Escritura segura en ruta restringida
+        const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'drafts', 'main-brochure');
+        await setDoc(docRef, {
+          htmlContent: pagesContainer.innerHTML,
+          lastUpdated: new Date().toISOString(),
+          updatedBy: auth.currentUser.uid
+        });
+
+        updateCloudStatus('Sincronizado', 'emerald');
+        showToast('¡Plantilla maestra guardada en la nube con éxito!');
+      } catch (err) {
+        console.error("Error al guardar en Firestore:", err);
+        updateCloudStatus('Error al Guardar', 'red');
+        showToast('Ocurrió un error al sincronizar con la nube.', true);
+      }
+    };
+
+    // Re-vincula todos los eventos de edición sobre los bloques dinámicos y cargadores tras refrescar el HTML
+    function rebindControls() {
+      const blocks = document.querySelectorAll('.mci-block');
+      blocks.forEach(block => {
+        // Remover controles anteriores si existen para evitar duplicados
+        const oldControls = block.querySelector('.block-controls');
+        if (oldControls) oldControls.remove();
+        
+        // Inyectar nuevos controles
+        block.insertAdjacentHTML('afterbegin', getControlsHTML());
+      });
+    }
+
+    // Notificaciones toast amigables integradas en la app (no bloqueantes)
+    function showToast(message, isError = false) {
+      const toast = document.getElementById('toast-notification');
+      const toastMsg = document.getElementById('toast-message');
+      const toastIcon = document.getElementById('toast-icon');
+      
+      if (!toast) return;
+      
+      toastMsg.textContent = message;
+      if (isError) {
+        toastIcon.className = "bg-red-600 text-white p-1.5 rounded-lg";
+        toastIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
+      } else {
+        toastIcon.className = "bg-blue-600 text-white p-1.5 rounded-lg";
+        toastIcon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
+      }
+      
+      toast.classList.remove('hidden');
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4000);
+    }
+
+    // Inicializa o recrea el QR
+    function initQR() {
+      try {
+        const canvas = document.getElementById('qr-canvas');
+        if (canvas && typeof QRious !== 'undefined') {
+          new QRious({
+            element: canvas,
+            value: 'https://ing.mcielectronics.cl/contacto-2',
+            size: 150,
+            background: 'white',
+            foreground: '#0f172a'
+          });
+        }
+      } catch (e) {
+        console.error("Error al renderizar código QR:", e);
+      }
+    }
+  </script>
+
+  <!-- INTERACTIVE JS FOR BUILDING AND IMAGE UPLOADING -->
   <script>
+    // CONTROL RESPONSIVO DEL SIDEBAR PARA DISPOSITIVOS MÓVILES
+    function toggleSidebar() {
+      const sidebar = document.getElementById('page-builder-sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      
+      if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        document.body.classList.add('overflow-hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+        document.body.classList.remove('overflow-hidden');
+      }
+    }
+
     // Generador de Controles de Bloque (Move, Duplicate, Delete)
-    // Para interactuar con los bloques que se agregan o duplican
     function getControlsHTML() {
       return `
         <div class="block-controls absolute -top-3 -right-2 bg-slate-950/95 text-white text-[10px] py-1 px-2.5 rounded-lg shadow-xl flex items-center gap-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-20 no-print border border-slate-800">
@@ -802,54 +1110,17 @@
       `;
     }
 
-    // Inicializa controles de bloque en todos los bloques estáticos cargados por defecto e inicializa el QR
-    document.addEventListener("DOMContentLoaded", function() {
-      const blocks = document.querySelectorAll('.mci-block');
-      blocks.forEach(block => {
-        if (!block.querySelector('.block-controls')) {
-          block.insertAdjacentHTML('afterbegin', getControlsHTML());
-        }
-      });
-
-      // INICIALIZACIÓN DEL CÓDIGO QR ESCANEABLE REAL
-      try {
-        if (typeof QRious !== 'undefined') {
-          new QRious({
-            element: document.getElementById('qr-canvas'),
-            value: 'https://ing.mcielectronics.cl/contacto-2',
-            size: 150,
-            background: 'white',
-            foreground: '#0f172a' // slate-900
-          });
-        } else {
-          drawFallbackQR();
-        }
-      } catch (e) {
-        console.error("No se pudo cargar QRious, dibujando fallback", e);
-        drawFallbackQR();
-      }
-    });
-
-    // Fallback gráfico de seguridad si la CDN de QRious no cargara correctamente
-    function drawFallbackQR() {
-      const canvas = document.getElementById('qr-canvas');
-      if (!canvas) return;
-      const ctx = canvas.getContext('2d');
-      canvas.width = 100;
-      canvas.height = 100;
-      ctx.fillStyle = "#0f172a";
-      // Draw standard square corners of a mock QR code
-      ctx.fillRect(0, 0, 30, 30); ctx.fillStyle = "white"; ctx.fillRect(5, 5, 20, 20); ctx.fillStyle = "#0f172a"; ctx.fillRect(10, 10, 10, 10);
-      ctx.fillRect(70, 0, 30, 30); ctx.fillStyle = "white"; ctx.fillRect(75, 5, 20, 20); ctx.fillStyle = "#0f172a"; ctx.fillRect(80, 10, 10, 10);
-      ctx.fillRect(0, 70, 30, 30); ctx.fillStyle = "white"; ctx.fillRect(5, 75, 20, 20); ctx.fillStyle = "#0f172a"; ctx.fillRect(10, 80, 10, 10);
-      ctx.fillRect(40, 40, 20, 20); ctx.fillRect(45, 15, 10, 15); ctx.fillRect(80, 45, 15, 10); ctx.fillRect(45, 80, 15, 15);
-    }
-
     // Desplazamiento rápido entre páginas usando el menú del constructor
     function scrollToPage(pageNumber) {
       const pageElement = document.getElementById(`brochure-page-${pageNumber}`);
       if (pageElement) {
         pageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        
+        // Autocerrar el menú lateral en móviles al navegar
+        const sidebar = document.getElementById('page-builder-sidebar');
+        if (!sidebar.classList.contains('-translate-x-full') && window.innerWidth < 1024) {
+          toggleSidebar();
+        }
       }
     }
 
@@ -859,7 +1130,7 @@
       if (!block) return;
       const clone = block.cloneNode(true);
       
-      // Resetea los inputs de archivo locales para evitar comportamientos cruzados
+      // Resetea los inputs de archivo locales para evitar errores cruzados
       const fileInput = clone.querySelector('input[type="file"]');
       if (fileInput) fileInput.value = '';
       
@@ -929,12 +1200,12 @@
         html = `
           <div class="mci-block relative group rounded-xl p-2 my-2">
             <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
-              <div class="w-20 h-20 bg-slate-200 border border-slate-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+              <div class="w-16 h-16 bg-blue-50 border border-blue-200 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
                 <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                 <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Nueva Foto">
-                <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
-                  <i class="fa-solid fa-camera text-base"></i>
-                  <span class="text-[8px] font-bold mt-1">FOTO</span>
+                <div class="image-upload-placeholder-icon text-blue-600 group-hover/img:text-blue-500 transition-colors flex flex-col items-center">
+                  <i class="fa-solid fa-camera text-lg"></i>
+                  <span class="text-[7px] font-bold mt-1">FOTO</span>
                 </div>
               </div>
               <div class="flex-grow">
@@ -947,19 +1218,19 @@
       } else if (type === 'image') {
         html = `
           <div class="mci-block relative group rounded-xl p-2 my-3">
-            <div class="w-full h-48 bg-slate-100 border border-slate-200 rounded-xl relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+            <div class="w-full h-44 bg-blue-50/40 border border-blue-200/50 rounded-xl relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
               <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
               <img class="absolute inset-0 w-full h-full object-cover hidden rounded-xl" alt="Gráfico/Imagen">
-              <div class="image-upload-placeholder-icon text-slate-400 group-hover/img:text-blue-600 transition-colors flex flex-col items-center gap-2">
-                <i class="fa-regular fa-image text-3xl"></i>
-                <span class="text-xs font-semibold">Subir Gráfica de Dashboard o Foto de Faena</span>
+              <div class="image-upload-placeholder-icon text-blue-600 group-hover/img:text-blue-500 transition-colors flex flex-col items-center gap-2">
+                <i class="fa-regular fa-image text-2xl"></i>
+                <span class="text-xs font-semibold">Subir Gráfica o Fotografía</span>
               </div>
             </div>
           </div>
         `;
       }
       
-      // Convertimos el string HTML a Elemento real para inyectarle el control bar
+      // Convertimos el string HTML a Elemento real para inyectarle la barra de control
       const tempDiv = document.createElement('div');
       tempDiv.innerHTML = html.trim();
       const newBlock = tempDiv.firstChild;
@@ -967,6 +1238,11 @@
       
       targetContainer.appendChild(newBlock);
       
+      // Cerrar sidebar en móviles tras agregar componente para visualización despejada
+      if (window.innerWidth < 1024) {
+        toggleSidebar();
+      }
+
       // Auto desplazamiento sutil hacia la sección modificada para confirmar la inserción
       newBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
@@ -979,6 +1255,7 @@
       }
     }
 
+    // Compresor de imágenes en caliente: Convierte a JPEG de max 500px para almacenamiento Base64 ultra-liviano
     function handleImageChange(event, inputElement) {
       const file = event.target.files[0];
       if (file) {
@@ -987,47 +1264,71 @@
         const placeholderIcon = container.querySelector('.image-upload-placeholder-icon');
 
         if (imgElement && file.type.startsWith('image/')) {
-          const imageUrl = URL.createObjectURL(file);
-          imgElement.src = imageUrl;
-          imgElement.classList.remove('hidden');
-          
-          if (placeholderIcon) {
-            placeholderIcon.classList.add('hidden');
-          }
-          
-          container.classList.remove('border-dashed');
-          container.classList.add('border-solid');
+          const reader = new FileReader();
+          reader.onload = function(e) {
+            const tempImg = new Image();
+            tempImg.onload = function() {
+              const canvas = document.createElement('canvas');
+              let width = tempImg.width;
+              let height = tempImg.height;
+              
+              // Dimensión máxima recomendada para mantener el Base64 bajo los 30KB
+              const MAX_DIM = 500;
+              if (width > height) {
+                if (width > MAX_DIM) {
+                  height *= MAX_DIM / width;
+                  width = MAX_DIM;
+                }
+              } else {
+                if (height > MAX_DIM) {
+                  width *= MAX_DIM / height;
+                  height = MAX_DIM;
+                }
+              }
+              
+              canvas.width = width;
+              canvas.height = height;
+              const ctx = canvas.getContext('2d');
+              ctx.drawImage(tempImg, 0, 0, width, height);
+              
+              // Conversión optimizada
+              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
+              
+              imgElement.src = compressedBase64;
+              imgElement.classList.remove('hidden');
+              
+              if (placeholderIcon) {
+                placeholderIcon.classList.add('hidden');
+              }
+              
+              container.classList.remove('border-dashed');
+              container.classList.add('border-solid');
+            };
+            tempImg.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
         }
       }
     }
 
-    // Acción: Guardar plantilla (Descarga un clon del HTML limpio con textos guardados)
+    // Acción: Guardar plantilla HTML local (Clona el estado limpio con los Base64 grabados)
     function downloadEditedHTML() {
-      // Duplicamos el DOM completo
       const docClone = document.documentElement.cloneNode(true);
+
+      // Asegurar que en el clon descargable el sidebar comience cerrado y limpio en móviles
+      const sidebarClone = docClone.querySelector('#page-builder-sidebar');
+      const overlayClone = docClone.querySelector('#sidebar-overlay');
+      if (sidebarClone) sidebarClone.classList.add('-translate-x-full');
+      if (overlayClone) overlayClone.classList.add('hidden');
+      docClone.body.classList.remove('overflow-hidden');
       
-      // Limpiamos referencias de imágenes con blob (que al volver a abrir se verían rotas)
-      const images = docClone.querySelectorAll('img');
-      images.forEach(img => {
-        if (img.src.startsWith('blob:')) {
-          img.src = '';
-          img.classList.add('hidden');
-          const container = img.parentElement;
-          const placeholder = container.querySelector('.image-upload-placeholder-icon');
-          if (placeholder) placeholder.classList.remove('hidden');
-          container.classList.remove('border-solid');
-          container.classList.add('border-dashed');
-        }
-      });
-      
-      // Exportamos el archivo como un nuevo documento HTML autoinstalable
       const htmlContent = "<!DOCTYPE html>\n" + docClone.outerHTML;
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'brochure_mci_personalizado_editable.html';
+      a.download = 'brochure_mci_personalizado_master.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
