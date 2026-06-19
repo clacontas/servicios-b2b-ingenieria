@@ -1006,16 +1006,18 @@
       }
 
       try {
-        // PARSER RELAJADO: Soporta copia de JS directo de Firebase
-        let cleaned = input;
+        // PARSER ULTRA-ROBUSTO: Busca la sección de la apiKey sin importar qué más se pegó
+        const match = input.match(/\{[\s\S]*?apiKey[\s\S]*?\}/);
+        if (!match) {
+          throw new Error("No se detectó el bloque const firebaseConfig = { ... }");
+        }
+        
+        let cleaned = match[0];
         
         // Eliminar comentarios de línea y bloque
         cleaned = cleaned.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1');
         
-        // Quitar declaraciones de variables de JS como const firebaseConfig = o var firebaseConfig = o let firebaseConfig =
-        cleaned = cleaned.replace(/(const|let|var)\s+firebaseConfig\s*=\s*/g, '');
-        
-        // Quitar puntos y comas al final
+        // Quitar declaraciones extras de variables o puntos y comas sobrantes
         cleaned = cleaned.trim().replace(/;+$/, '');
         
         let parsedConfig;
@@ -1035,8 +1037,13 @@
           parsedConfig = JSON.parse(formatted);
         }
 
+        // Validar claves mínimas obligatorias para evitar caídas en el SDK
+        if (!parsedConfig.apiKey || !parsedConfig.projectId) {
+          throw new Error("La configuración extraída está incompleta.");
+        }
+
         localStorage.setItem('mci_firebase_config', JSON.stringify(parsedConfig));
-        showToast('¡Conectado exitosamente! Guardando credenciales...');
+        showToast('¡Configuración de Firebase guardada exitosamente!');
         
         // Esconder panel
         document.getElementById('firebase-config-panel').classList.add('hidden');
@@ -1044,7 +1051,8 @@
         // Reiniciar conexión Firebase
         await window.initFirebase(parsedConfig);
       } catch (err) {
-        showToast('Formato de Firebase inválido. Recuerda que puedes copiar y pegar TODO el código tal como te lo entrega Google Firebase.', true);
+        console.error("Error al procesar el parser relajado:", err);
+        showToast('No pudimos extraer las credenciales. Asegúrate de copiar el cuadro completo de Firebase.', true);
       }
     };
 
