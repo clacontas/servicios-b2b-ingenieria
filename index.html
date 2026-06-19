@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCI Electronics - Brochure de Ingeniería y Telemetría IoT</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Poppins & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f1f5f9;
+    }
+    h1, h2, h3, h4 {
+      font-family: 'Poppins', sans-serif;
+    }
+    
+    /* Configuración de tamaño de página A4 para visualización realista */
+    .brochure-page {
+      width: 210mm;
+      min-height: 297mm;
+      background-color: #ffffff;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      margin: 2rem auto;
+      padding: 20mm 15mm;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    /* Estilos específicos para impresión impecable a PDF */
+    @media print {
+      body {
+        background-color: #ffffff;
+        margin: 0;
+        padding: 0;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .brochure-page {
+        width: 210mm;
+        height: 297mm;
+        min-height: 297mm;
+        box-shadow: none;
+        margin: 0 !important;
+        padding: 20mm 15mm;
+        page-break-after: always;
+        page-break-inside: avoid;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+      }
+      /* Ocultar bordes de subida e iconos de placeholder en impresión si están vacíos */
+      .image-upload-placeholder-icon {
+        display: none !important;
+      }
+      .image-upload-zone {
+        border: none !important;
+        background: transparent !important;
+      }
+    }
+
+    /* Decoraciones geométricas inspiradas en los PDFs de MCI */
+    .mci-geometric-bg {
+      background: radial-gradient(circle at top right, #1e3a8a 0%, #0f172a 100%);
+    }
+    
+    .accent-bar {
+      height: 4px;
+      background: linear-gradient(90deg, #38bdf8 0%, #2563eb 100%);
+    }
+
+    /* Efectos de hover para el modo de edición */
+    [contenteditable="true"]:hover {
+      outline: 2px dashed #38bdf8;
+      background-color: rgba(56, 189, 248, 0.05);
+      cursor: text;
+    }
+    [contenteditable="true"]:focus {
+      outline: 2px solid #2563eb;
+      background-color: rgba(37, 99, 235, 0.05);
+    }
+
+    /* Efecto hover personalizado para bloques editables */
+    .mci-block {
+      border: 1px solid transparent;
+      transition: all 150ms ease;
+    }
+    .mci-block:hover {
+      background-color: rgba(37, 99, 235, 0.02);
+      border-color: rgba(37, 99, 235, 0.15) !important;
+    }
+  </style>
+</head>
+<body class="text-slate-800 antialiased">
+
+  <!-- CONTENEDOR FLEX PRINCIPAL: SIDEBAR + BROCHURE -->
+  <div class="flex min-h-screen">
+
+    <!-- BARRA LATERAL IZQUIERDA DE HERRAMIENTAS Y CONSTRUCCIÓN (NO SE IMPRIME) -->
+    <div class="w-80 bg-slate-900 text-white p-6 sticky top-0 h-screen overflow-y-auto no-print flex-shrink-0 border-r border-slate-800 shadow-2xl flex flex-col justify-between">
+      <div class="space-y-6">
+        <!-- Brand -->
+        <div class="border-b border-slate-800 pb-4">
+          <div class="flex items-center gap-3">
+            <div class="bg-blue-600 p-2 rounded-lg">
+              <i class="fa-solid fa-cubes text-xl"></i>
+            </div>
+            <div>
+              <h2 class="font-extrabold text-base leading-tight">MCI Page Builder</h2>
+              <p class="text-[10px] text-slate-400">Constructor de Propuestas IoT</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Navegación de Páginas -->
+        <div class="space-y-2">
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Navegación de Páginas</span>
+          <div class="grid grid-cols-3 gap-1 text-center">
+            <button onclick="scrollToPage(1)" class="bg-slate-800 hover:bg-slate-700 py-1.5 rounded text-xs transition-colors font-medium">Pág 1</button>
+            <button onclick="scrollToPage(2)" class="bg-slate-800 hover:bg-slate-700 py-1.5 rounded text-xs transition-colors font-medium">Pág 2</button>
+            <button onclick="scrollToPage(3)" class="bg-slate-800 hover:bg-slate-700 py-1.5 rounded text-xs transition-colors font-medium">Pág 3</button>
+            <button onclick="scrollToPage(4)" class="bg-slate-800 hover:bg-slate-700 py-1.5 rounded text-xs transition-colors font-medium">Pág 4</button>
+            <button onclick="scrollToPage(5)" class="bg-slate-800 hover:bg-slate-700 py-1.5 rounded text-xs transition-colors font-medium">Pág 5</button>
+            <button onclick="scrollToPage(6)" class="bg-slate-800 hover:bg-slate-700 py-1.5 rounded text-xs transition-colors font-medium">Pág 6</button>
+          </div>
+        </div>
+
+        <!-- Controles del Constructor Modular -->
+        <div class="space-y-4 pt-2">
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block border-t border-slate-800 pt-4">Añadir Nuevos Componentes</span>
+          
+          <div>
+            <label class="block text-[10px] font-medium text-slate-400 mb-1">1. Seleccionar Página de Destino</label>
+            <select id="target-page-select" class="w-full bg-slate-800 text-white rounded-lg p-2 text-xs border border-slate-700 focus:outline-none focus:border-blue-500">
+              <option value="page-1-content">Página 1 (Portada)</option>
+              <option value="page-2-content">Página 2 (Flujo Telemetría)</option>
+              <option value="page-3-content" selected>Página 3 (Temperatura)</option>
+              <option value="page-4-content">Página 4 (Energía)</option>
+              <option value="page-5-content">Página 5 (Complementarios)</option>
+              <option value="page-6-content">Página 6 (Contacto/Metodología)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-medium text-slate-400 mb-2">2. Haz clic para insertar:</label>
+            <div class="grid grid-cols-1 gap-2">
+              <button onclick="addComponent('title')" class="bg-slate-800 hover:bg-slate-700 hover:border-sky-500 text-left text-xs py-2 px-3 rounded-lg border border-slate-700/50 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-heading text-sky-400 w-4"></i> Título con barra de acento
+              </button>
+              <button onclick="addComponent('paragraph')" class="bg-slate-800 hover:bg-slate-700 hover:border-sky-500 text-left text-xs py-2 px-3 rounded-lg border border-slate-700/50 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-paragraph text-sky-400 w-4"></i> Párrafo de texto editable
+              </button>
+              <button onclick="addComponent('card')" class="bg-slate-800 hover:bg-slate-700 hover:border-sky-500 text-left text-xs py-2 px-3 rounded-lg border border-slate-700/50 transition-all flex items-center gap-2">
+                <i class="fa-solid fa-box text-sky-400 w-4"></i> Tarjeta con Foto para Sensor
+              </button>
+              <button onclick="addComponent('image')" class="bg-slate-800 hover:bg-slate-700 hover:border-sky-500 text-left text-xs py-2 px-3 rounded-lg border border-slate-700/50 transition-all flex items-center gap-2">
+                <i class="fa-regular fa-image text-sky-400 w-4"></i> Bloque de Imagen / Gráfico
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Footer del Sidebar con créditos e instrucciones -->
+      <div class="border-t border-slate-800 pt-4 mt-6 text-[11px] text-slate-500 space-y-2">
+        <p><i class="fa-solid fa-circle-question mr-1 text-slate-400"></i> Recuerda rellenar todos los textos e imágenes antes de exportar a PDF final.</p>
+        <p class="text-[10px] text-slate-600">MCI Electronics © 2026</p>
+      </div>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL: BROCHURE -->
+    <div class="flex-grow overflow-y-auto bg-slate-100 pb-12">
+
+      <!-- BARRA DE CONTROL SUPERIOR (NO SE IMPRIME) -->
+      <div class="no-print bg-slate-900 text-white py-4 px-6 sticky top-0 z-50 shadow-xl border-b border-slate-800 font-medium">
+        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div class="flex items-center gap-3">
+            <div class="bg-blue-600 p-2 rounded-lg">
+              <i class="fa-solid fa-file-pdf text-xl"></i>
+            </div>
+            <div>
+              <h1 class="font-bold text-base leading-tight">MCI Ingeniería - Editor Corporativo</h1>
+              <p class="text-[10px] text-slate-400">Crea propuestas de telemetría a la medida de tu cliente</p>
+            </div>
+          </div>
+          
+          <!-- Botones de Acción -->
+          <div class="flex items-center gap-3">
+            <!-- Descargar copia HTML con cambios permanentemente guardados -->
+            <button onclick="downloadEditedHTML()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-500 font-semibold px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-2">
+              <i class="fa-solid fa-code"></i> Guardar Plantilla (HTML)
+            </button>
+            <!-- Imprimir/Exportar a PDF -->
+            <button onclick="window.print()" class="bg-gradient-to-r from-blue-500 to-sky-400 hover:from-blue-600 hover:to-sky-500 text-white font-semibold px-5 py-2 rounded-lg shadow-lg transition-all transform hover:-translate-y-0.5 text-xs flex items-center gap-2">
+              <i class="fa-solid fa-file-export"></i> Exportar / Imprimir PDF
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- CONTENEDOR DE PÁGINAS A4 -->
+      <div id="brochure-pages-container" class="space-y-4">
+
+        <!-- ================= PÁGINA 1: PORTADA ================= -->
+        <div id="brochure-page-1" class="brochure-page mci-geometric-bg text-white">
+          <div class="absolute inset-0 opacity-10 pointer-events-none">
+            <svg width="100%" height="100%">
+              <line x1="0" y1="10%" x2="100%" y2="40%" stroke="white" stroke-width="2"/>
+              <line x1="0" y1="80%" x2="100%" y2="60%" stroke="white" stroke-width="2"/>
+              <circle cx="90%" cy="20%" r="150" fill="none" stroke="white" stroke-width="3"/>
+              <circle cx="10%" cy="85%" r="80" fill="none" stroke="white" stroke-width="2"/>
+            </svg>
+          </div>
+
+          <div class="flex justify-between items-center z-10">
+            <div class="border-l-4 border-sky-400 pl-3">
+              <span class="text-xs tracking-widest text-sky-400 font-bold uppercase block">Ingeniería</span>
+              <span class="text-lg tracking-wider font-extrabold" contenteditable="true">MCI electronics</span>
+            </div>
+            <div class="text-right text-xs text-slate-400">
+              <p contenteditable="true">ing.mcielectronics.cl</p>
+            </div>
+          </div>
+
+          <!-- Contenedor editable de Portada -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-8 my-auto z-10 items-center">
+            
+            <div id="page-1-content" class="md:col-span-7 space-y-4">
+              <div class="mci-block relative group rounded-xl p-2">
+                <span class="text-xs tracking-widest uppercase font-semibold text-sky-300 bg-sky-950/50 border border-sky-800/30 px-3 py-1 rounded-full inline-block" contenteditable="true">Soluciones de Telemetría IoT</span>
+              </div>
+              <div class="mci-block relative group rounded-xl p-2">
+                <h1 class="text-4xl md:text-5xl font-extrabold leading-tight" contenteditable="true">
+                  Monitoreo Industrial e Ingeniería Inteligente
+                </h1>
+                <div class="accent-bar w-24 mt-2 rounded"></div>
+              </div>
+              <div class="mci-block relative group rounded-xl p-2">
+                <p class="text-slate-300 text-sm leading-relaxed" contenteditable="true">
+                  Optimiza la gestión operacional, asegura la calidad de tus procesos críticos y reduce tus costos mensuales de energía con tecnología inalámbrica de vanguardia.
+                </p>
+              </div>
+            </div>
+
+            <!-- Imagen Portada Principal -->
+            <div class="md:col-span-5 flex justify-center">
+              <div class="w-full max-w-[280px] h-[340px] bg-slate-800/40 border-2 border-dashed border-slate-600 hover:border-sky-400 transition-colors rounded-2xl relative overflow-hidden group cursor-pointer flex flex-col justify-center items-center p-4 text-center" onclick="triggerImageUpload(this)">
+                <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                <img class="absolute inset-0 w-full h-full object-cover hidden rounded-2xl" alt="Portada">
+                <div class="image-upload-placeholder-icon flex flex-col items-center gap-3 text-slate-400 group-hover:text-sky-400 transition-colors">
+                  <i class="fa-regular fa-image text-4xl"></i>
+                  <span class="text-xs font-semibold">Subir Foto de Portada</span>
+                  <p class="text-[9px] text-slate-500 max-w-[180px]">Recomendado: Imagen industrial o tecnológica</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Portada / Contacto Rápido -->
+          <div class="border-t border-slate-800/60 pt-6 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 z-10">
+            <div>
+              <p class="text-xs text-sky-400 uppercase tracking-wider font-semibold" contenteditable="true">Tu aliado confiable en proyectos de ingeniería</p>
+              <p class="text-xs text-slate-400 mt-1" contenteditable="true">Construyendo un futuro juntos • Edición 2026</p>
+            </div>
+            <div class="flex items-center gap-4">
+              <div class="bg-white p-1.5 rounded-lg shadow-md">
+                <svg class="w-12 h-12 text-slate-900" viewBox="0 0 100 100">
+                  <rect x="0" y="0" width="30" height="30" fill="currentColor"/> <rect x="5" y="5" width="20" height="20" fill="white"/> <rect x="10" y="10" width="10" height="10" fill="currentColor"/>
+                  <rect x="70" y="0" width="30" height="30" fill="currentColor"/> <rect x="75" y="5" width="20" height="20" fill="white"/> <rect x="80" y="10" width="10" height="10" fill="currentColor"/>
+                  <rect x="0" y="70" width="30" height="30" fill="currentColor"/> <rect x="5" y="75" width="20" height="20" fill="white"/> <rect x="10" y="80" width="10" height="10" fill="currentColor"/>
+                  <rect x="40" y="10" width="10" height="20" fill="currentColor"/> <rect x="55" y="0" width="10" height="10" fill="currentColor"/>
+                  <rect x="45" y="45" width="15" height="15" fill="currentColor"/> <rect x="80" y="45" width="10" height="20" fill="currentColor"/>
+                  <rect x="40" y="80" width="20" height="10" fill="currentColor"/> <rect x="80" y="80" width="15" height="15" fill="currentColor"/>
+                </svg>
+              </div>
+              <div>
+                <p class="text-[10px] text-slate-400 tracking-wider uppercase font-semibold">Consultas Técnicas</p>
+                <p class="text-xs text-sky-300 font-bold" contenteditable="true">ingenieria@mcielectronics.cl</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+
+        <!-- ================= PÁGINA 2: TELEMETRÍA EXPLICACIÓN (DIAGRAMA) ================= -->
+        <div id="brochure-page-2" class="brochure-page text-slate-800">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+            <div>
+              <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
+              <span class="text-sm font-extrabold text-slate-900">Soluciones de Telemetría</span>
+            </div>
+            <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
+          </div>
+
+          <!-- Contenido Modificable Página 2 -->
+          <div id="page-2-content" class="my-auto space-y-8">
+            <div class="mci-block relative group rounded-xl p-2 text-center max-w-lg mx-auto">
+              <h2 class="text-2xl font-bold text-slate-900 mb-3" contenteditable="true">¿En qué consiste nuestra solución?</h2>
+              <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
+                Establecemos un puente inalámbrico de alta confiabilidad entre las variables críticas de tus operaciones físicas y la toma de decisiones informadas, utilizando tecnología de bajísimo mantenimiento y plataformas en tiempo real.
+              </p>
+            </div>
+
+            <!-- Diagrama de Telemetría -->
+            <div class="mci-block relative group rounded-xl p-2">
+              <div class="bg-slate-50 border border-slate-100 rounded-2xl p-6 shadow-inner">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 relative">
+                  <!-- Sensor -->
+                  <div class="flex flex-col items-center text-center p-4 bg-white rounded-xl shadow-sm relative z-10 border border-slate-200/50">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3">
+                      <i class="fa-solid fa-temperature-half text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1" contenteditable="true">01. Sensores</h4>
+                    <p class="text-[11px] text-slate-500 mb-2" contenteditable="true">Miden las variables del entorno físico.</p>
+                    <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full uppercase" contenteditable="true">Hasta 5 años batería</span>
+                  </div>
+
+                  <!-- Gateway -->
+                  <div class="flex flex-col items-center text-center p-4 bg-white rounded-xl shadow-sm relative z-10 border border-slate-200/50">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3">
+                      <i class="fa-solid fa-tower-cell text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1" contenteditable="true">02. Gateway</h4>
+                    <p class="text-[11px] text-slate-500 mb-2" contenteditable="true">Recibe datos por RF de largo alcance y sube a internet.</p>
+                    <span class="text-[9px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase" contenteditable="true">Hasta 1 KM / 4G / Eth</span>
+                  </div>
+
+                  <!-- Servidor MCIIoT -->
+                  <div class="flex flex-col items-center text-center p-4 bg-white rounded-xl shadow-sm relative z-10 border border-slate-200/50">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-3">
+                      <i class="fa-solid fa-cloud text-xl"></i>
+                    </div>
+                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1" contenteditable="true">03. Servidor MCIIoT</h4>
+                    <p class="text-[11px] text-slate-500 mb-2" contenteditable="true">Almacena, despliega y analiza los datos recopilados.</p>
+                    <span class="text-[9px] bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded-full uppercase" contenteditable="true">Alertas y Dashboards</span>
+                  </div>
+
+                  <div class="hidden md:block absolute top-1/2 left-0 right-0 h-0.5 bg-gradient-to-r from-blue-300 via-sky-300 to-blue-300 -translate-y-1/2 z-0"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Doble Tarjeta Informativa -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+              <div class="mci-block relative group rounded-xl p-2 bg-blue-50/60 border border-blue-100/50">
+                <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase" contenteditable="true"><i class="fa-solid fa-shield-halved mr-1"></i> Resiliencia ante Desconexión</h4>
+                <p class="text-slate-600 text-[11px]" contenteditable="true">
+                  ¿Se cayó el internet? No hay pérdida de datos. Nuestros sensores de última generación guardan la trazabilidad internamente y la retransmiten con marca de tiempo exacta una vez que la red regresa.
+                </p>
+              </div>
+              <div class="mci-block relative group rounded-xl p-2 bg-blue-50/60 border border-blue-100/50">
+                <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase" contenteditable="true"><i class="fa-solid fa-network-wired mr-1"></i> Flexibilidad de Plataforma</h4>
+                <p class="text-slate-600 text-[11px]" contenteditable="true">
+                  Visualiza en nuestra amigable plataforma en la nube **MCIIoT** o despacha datos directamente a tus propios sistemas locales mediante integraciones API o protocolos industriales de comunicación.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 mt-6">
+            <p contenteditable="true">MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
+            <p>Página 2</p>
+          </div>
+        </div>
+
+
+        <!-- ================= PÁGINA 3: TEMPERATURA Y HUMEDAD ================= -->
+        <div id="brochure-page-3" class="brochure-page text-slate-800">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+            <div>
+              <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
+              <span class="text-sm font-extrabold text-slate-900">Monitoreo de Condiciones</span>
+            </div>
+            <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
+          </div>
+
+          <!-- Contenido Modificable Página 3 -->
+          <div id="page-3-content" class="my-auto space-y-6">
+            <div class="mci-block relative group rounded-xl p-2">
+              <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true">Módulo de Especialidad</span>
+              <h2 class="text-2xl font-bold text-slate-900 mb-2" contenteditable="true">Monitoreo de Temperatura y Humedad</h2>
+              <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
+                Garantizamos la seguridad, trazabilidad y máxima calidad en la cadena de frío. Automatiza el control en tus bodegas, laboratorios and logística de tránsito mediante alertas inteligentes instantáneas.
+              </p>
+            </div>
+
+            <!-- Grid de Sensores (Cada uno es un mci-block independiente) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              <!-- Sonoff -->
+              <div class="mci-block relative group p-3 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
+                <div class="w-20 h-20 bg-slate-200 border border-slate-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                  <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                  <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Sonoff">
+                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
+                    <i class="fa-solid fa-house-laptop text-base"></i>
+                    <span class="text-[8px] font-bold mt-1">FOTO</span>
+                  </div>
+                </div>
+                <div class="flex-grow">
+                  <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">01. Sonoff TH Elite</h4>
+                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
+                    Controlador ideal para hogares y oficinas con pantalla de estado en vivo. Permite automatizar sistemas de climatización local de manera económica e integrada.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Teltonika -->
+              <div class="mci-block relative group p-3 bg-sky-50 rounded-xl border border-sky-100 flex gap-3 items-center">
+                <div class="w-20 h-20 bg-sky-200/50 border border-sky-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                  <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                  <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Teltonika">
+                  <div class="image-upload-placeholder-icon text-sky-600 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
+                    <i class="fa-solid fa-bluetooth text-base"></i>
+                    <span class="text-[8px] font-bold mt-1">FOTO</span>
+                  </div>
+                </div>
+                <div class="flex-grow">
+                  <h4 class="font-bold text-xs uppercase text-blue-900" contenteditable="true">02. Teltonika EYE Sensor</h4>
+                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
+                    Sensor inalámbrico ultra-robusto IP67 (Bluetooth BLE). Se enlaza con gateways de transporte para auditar la cadena de frío en ruta.
+                  </p>
+                </div>
+              </div>
+
+              <!-- iButton -->
+              <div class="mci-block relative group p-3 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
+                <div class="w-20 h-20 bg-slate-200 border border-slate-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                  <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                  <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="iButton">
+                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
+                    <i class="fa-solid fa-circle-dot text-base"></i>
+                    <span class="text-[8px] font-bold mt-1">FOTO</span>
+                  </div>
+                </div>
+                <div class="flex-grow">
+                  <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">03. iButton Data Loggers</h4>
+                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
+                    Dispositivo de contacto metálico autónomo con memoria integrada. Ideal para auditorías estrictas directamente dentro de cajas térmicas de fármacos.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Milesight -->
+              <div class="mci-block relative group p-3 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
+                <div class="w-20 h-20 bg-slate-200 border border-slate-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                  <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                  <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Milesight">
+                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
+                    <i class="fa-solid fa-wifi text-base"></i>
+                    <span class="text-[8px] font-bold mt-1">FOTO</span>
+                  </div>
+                </div>
+                <div class="flex-grow">
+                  <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">04. Milesight TS301 / EM300</h4>
+                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
+                    Tecnología industrial LoRaWAN de largo alcance. Diseñado con baterías de altísima duración para monitoreo de laboratorios y cámaras industriales.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Caso de éxito (Temperatura y Humedad - Anonimizado para cumplir NT 147 ISP) -->
+            <div class="mci-block relative group rounded-xl p-2 border border-slate-100 bg-slate-50/60">
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                <div class="md:col-span-8">
+                  <h4 class="font-bold text-xs text-blue-900 mb-2 uppercase" contenteditable="true"><i class="fa-solid fa-file-shield mr-1"></i> Caso de Éxito: Cumplimiento de Normativa Sanitaria (NT 147 ISP)</h4>
+                  <p class="text-[11px] text-slate-600 leading-relaxed" contenteditable="true">
+                    Diseñamos e implementamos un sistema de telemetría IoT de alta precisión para una destacada empresa líder en logística y distribución farmacéutica. Integramos gateways industriales **Milesight UG65** con una red de sensores inalámbricos de temperatura y humedad distribuidos por toda la bodega. Los datos se transmiten encriptados en tiempo real a la plataforma **MCIIoT**, automatizando la entrega de informes semanales requeridos y activando alertas inmediatas vía correo electrónico y Telegram ante cualquier desviación térmica, garantizando el cumplimiento riguroso de la norma NT 147 del Instituto de Salud Pública (ISP) de Chile y asegurando la continuidad operativa del centro.
+                  </p>
+                </div>
+                <div class="md:col-span-4 h-28 bg-slate-200 border border-slate-300 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                  <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                  <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Bodega Fármacos">
+                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center gap-1 text-[10px] font-semibold p-2">
+                    <i class="fa-regular fa-image text-lg"></i>
+                    <span>Foto de Bodega o Dashboard</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- CTA de Alertas -->
+            <div class="mci-block relative group rounded-xl p-2">
+              <div class="bg-slate-900 text-white rounded-xl p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                <div class="max-w-md">
+                  <h4 class="font-bold text-xs uppercase text-sky-400" contenteditable="true">¿Sufres pérdidas por fallas en climatización?</h4>
+                  <p class="text-[10px] text-slate-300 mt-1" contenteditable="true">
+                    Configura alertas inmediatas y personalizadas a tus equipos de trabajo vía Telegram, Correo Electrónico o llamadas automáticas ante cualquier quiebre imprevisto en los umbrales configurados.
+                  </p>
+                </div>
+                <a href="mailto:ingenieria@mcielectronics.cl" class="bg-blue-600 text-white font-bold text-xs px-3 py-2 rounded shadow hover:bg-blue-700 transition-colors whitespace-nowrap text-center" contenteditable="true">Saber Más</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 mt-6">
+            <p contenteditable="true">MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
+            <p>Página 3</p>
+          </div>
+        </div>
+
+
+        <!-- ================= PÁGINA 4: CONSUMO ENERGÉTICO ================= -->
+        <div id="brochure-page-4" class="brochure-page text-slate-800">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+            <div>
+              <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
+              <span class="text-sm font-extrabold text-slate-900">Eficiencia Energética</span>
+            </div>
+            <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
+          </div>
+
+          <!-- Contenido Modificable Página 4 -->
+          <div id="page-4-content" class="my-auto space-y-6">
+            <div class="mci-block relative group rounded-xl p-2">
+              <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true">Gestión de Consumos</span>
+              <h2 class="text-2xl font-bold text-slate-900 mb-2" contenteditable="true">Monitoreo de Consumo Energético</h2>
+              <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
+                Toma el control absoluto del gasto eléctrico de tu negocio o industria. Nuestras tecnologías te permiten mapear en tiempo real los consumos, optimizar el uso de tus recursos y cumplir con las normativas energéticas del país.
+              </p>
+            </div>
+
+            <!-- Ley de Eficiencia -->
+            <div class="mci-block relative group rounded-xl p-2">
+              <div class="bg-gradient-to-r from-blue-900 to-slate-900 text-white p-4 rounded-xl flex items-center gap-4 border-l-4 border-sky-400">
+                <div class="bg-sky-500/15 p-2 rounded-lg text-sky-400 text-xl hidden sm:block">
+                  <i class="fa-solid fa-gavel"></i>
+                </div>
+                <div class="text-xs">
+                  <h4 class="font-bold uppercase text-sky-400 mb-1" contenteditable="true">Ley de Eficiencia Energética (Ley 21.305)</h4>
+                  <p class="text-slate-300 text-[10px]" contenteditable="true">
+                    ¿Sabías que en Chile las grandes empresas deben implementar sistemas de gestión y reportar sus consumos de energía e intensidad al Ministerio? En MCI implementamos sistemas homologados listos para reportar de forma simple.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Monitoreo No Invasivo -->
+              <div class="mci-block relative group rounded-xl p-3 bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                <div>
+                  <h4 class="font-bold text-xs uppercase text-slate-900 mb-2" contenteditable="true"><i class="fa-solid fa-gauge-high mr-1 text-blue-600"></i> Medición Sin Intervención</h4>
+                  <p class="text-[11px] text-slate-600 mb-3" contenteditable="true">
+                    Instalamos sensores de corriente autoalimentados de pinza abierta **Milesight CT101/CT103**. Monitorea el consumo de tus tableros o maquinarias críticas sin necesidad de cortar el suministro ni interrumpir tu proceso productivo.
+                  </p>
+                </div>
+                <div class="w-full h-24 bg-slate-200 border border-slate-300 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                  <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                  <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Tablero">
+                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex items-center gap-2 text-xs font-semibold">
+                    <i class="fa-regular fa-image"></i>
+                    <span>Foto de Tablero</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Control de Oficinas -->
+              <div class="mci-block relative group rounded-xl p-3 bg-slate-50 border border-slate-100 flex flex-col justify-between">
+                <div>
+                  <h4 class="font-bold text-xs uppercase text-slate-900 mb-2" contenteditable="true"><i class="fa-solid fa-building-circle-check mr-1 text-blue-600"></i> Edificios Inteligentes</h4>
+                  <p class="text-[11px] text-slate-600 mb-3" contenteditable="true">
+                    Optimiza el consumo en iluminación y climatización (HVAC) acoplando sensores PIR, detectores de ocupación y enchufes inteligentes LoRaWAN. Enciende o apaga la luz y el aire acondicionado basándote únicamente en el uso real de las salas.
+                  </p>
+                </div>
+                <div class="w-full h-24 bg-slate-200 border border-slate-300 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                  <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                  <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Edificio">
+                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex items-center gap-2 text-xs font-semibold">
+                    <i class="fa-regular fa-image"></i>
+                    <span>Foto de Oficina / Sensores</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Caso de éxito -->
+            <div class="mci-block relative group rounded-xl p-2 border border-slate-100 bg-slate-50/60">
+              <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
+                <div class="md:col-span-8">
+                  <h4 class="font-bold text-xs text-blue-900 mb-2 uppercase" contenteditable="true"><i class="fa-solid fa-solar-panel mr-1"></i> Caso de Éxito: Telemetría en Planta Solar</h4>
+                  <p class="text-[11px] text-slate-600 leading-relaxed" contenteditable="true">
+                    Desarrollamos e integramos con éxito un sistema de medición energética en faenas de generación solar. El sistema extrae datos de generación directamente desde inversores industriales mediante protocolo Modbus TCP, transmitiéndolos vía celular (3G/4G) a la nube **MCIIoT** para visualizar la inyección y diagnosticar caídas de inversores de forma remota.
+                  </p>
+                </div>
+                <div class="md:col-span-4 h-28 bg-slate-200 border border-slate-300 rounded-lg relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                  <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                  <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Planta Solar">
+                  <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex items-center gap-1 text-[10px] font-semibold p-2">
+                    <i class="fa-regular fa-image text-lg"></i>
+                    <span>Foto Planta Solar</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 mt-6">
+            <p contenteditable="true">MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
+            <p>Página 4</p>
+          </div>
+        </div>
+
+
+        <!-- ================= PÁGINA 5: COMPLEMENTARIO ================= -->
+        <div id="brochure-page-5" class="brochure-page text-slate-800">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+            <div>
+              <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
+              <span class="text-sm font-extrabold text-slate-900">Ecosistema Complementario</span>
+            </div>
+            <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
+          </div>
+
+          <!-- Contenido Modificable Página 5 -->
+          <div id="page-5-content" class="my-auto space-y-6">
+            <div class="mci-block relative group rounded-xl p-2 text-center max-w-lg mx-auto">
+              <h2 class="text-xl font-bold text-slate-900 mb-2" contenteditable="true">Ecosistema de Soluciones IoT e Ingeniería</h2>
+              <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
+                Nuestra plataforma **MCIIoT** es versátil. Expandimos el poder de tu infraestructura de telemetría agregando de manera sencilla sensores de especialidad complementaria para resolver otras necesidades clave.
+              </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              
+              <!-- Recursos Hídricos -->
+              <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3">
+                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-droplet"></i></div>
+                <div>
+                  <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">Control de Recursos Hídricos</h4>
+                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
+                    Monitoreo continuo de flujo en sistemas de riego, niveles de agua en estanques de acumulación mediante ultrasonido y detección de fugas en salas de bombas críticas.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Calidad de Aire -->
+              <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3">
+                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-wind"></i></div>
+                <div>
+                  <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">Calidad Medioambiental (CO2 / UV)</h4>
+                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
+                    Protección de colaboradores en exteriores mediante sensores de radiación UV y monitoreo de CO2 y ventilación en salones de clases u oficinas para garantizar espacios de alta concentración.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Conteo de Personas -->
+              <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3">
+                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-people-group"></i></div>
+                <div>
+                  <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">Flujo de Personas y Activos</h4>
+                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
+                    Analiza el tráfico real de clientes en tiendas de retail para planificar turnos, optimizar el uso de salas corporativas o medir la tasa de ocupación en estacionamientos vehiculares.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Servicios de Ingeniería -->
+              <div class="mci-block relative group p-4 bg-blue-50/50 rounded-xl border border-blue-100/50 flex gap-3">
+                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-microchip"></i></div>
+                <div>
+                  <h4 class="font-bold text-xs uppercase text-blue-900" contenteditable="true">Diseño Electrónico e Integración</h4>
+                  <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">
+                    Somos fabricantes. Ofrecemos diseño de circuitos impresos (PCB), programación de firmware a medida, integración de tableros eléctricos con PLCs industriales multimarca y puestas en marcha completas en terreno.
+                  </p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 mt-6">
+            <p contenteditable="true">MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
+            <p>Página 5</p>
+          </div>
+        </div>
+
+
+        <!-- ================= PÁGINA 6: METODOLOGÍA Y CIERRE ================= -->
+        <div id="brochure-page-6" class="brochure-page text-slate-800">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-6">
+            <div>
+              <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
+              <span class="text-sm font-extrabold text-slate-900">Contacto y Metodología</span>
+            </div>
+            <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
+          </div>
+
+          <!-- Contenido Modificable Página 6 -->
+          <div id="page-6-content" class="my-auto space-y-6">
+            
+            <div class="mci-block relative group rounded-xl p-2">
+              <h2 class="text-lg font-bold text-slate-900 mb-1" contenteditable="true">¿Cómo implementamos la solución en tu negocio?</h2>
+              <p class="text-slate-600 text-[11px]" contenteditable="true">
+                Facilitamos tu transición tecnológica sin fricciones operativas de manera ágil en 4 fases clave:
+              </p>
+            </div>
+
+            <!-- Fases -->
+            <div class="mci-block relative group rounded-xl p-2">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                  <div class="text-lg font-extrabold text-blue-600 mb-1" contenteditable="true">Fase 1</div>
+                  <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1" contenteditable="true">Diagnóstico</h4>
+                  <p class="text-[9px] text-slate-500" contenteditable="true">Reunión técnica y visita en terreno para evaluar cobertura.</p>
+                </div>
+                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                  <div class="text-lg font-extrabold text-blue-600 mb-1" contenteditable="true">Fase 2</div>
+                  <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1" contenteditable="true">Propuesta</h4>
+                  <p class="text-[9px] text-slate-500" contenteditable="true">Cotización detallada de sensores, plazos y licenciamiento.</p>
+                </div>
+                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                  <div class="text-lg font-extrabold text-blue-600 mb-1" contenteditable="true">Fase 3</div>
+                  <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1" contenteditable="true">Instalación</h4>
+                  <p class="text-[9px] text-slate-500" contenteditable="true">Montaje técnico in situ o despacho de kits autoinstalables.</p>
+                </div>
+                <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
+                  <div class="text-lg font-extrabold text-blue-600 mb-1" contenteditable="true">Fase 4</div>
+                  <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1" contenteditable="true">Capacitación</h4>
+                  <p class="text-[9px] text-slate-500" contenteditable="true">Configuración de dashboards en MCIIoT y postventa.</p>
+                </div>
+              </div>
+            </div>
+
+            <!-- Tarjeta de Ejecutivo -->
+            <div class="mci-block relative group rounded-xl p-2">
+              <div class="bg-gradient-to-br from-slate-900 to-blue-950 text-white rounded-2xl p-6 flex flex-col md:flex-row items-center gap-6 relative">
+                
+                <div class="w-24 h-24 bg-slate-800 border border-slate-700 rounded-full relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center flex-shrink-0" onclick="triggerImageUpload(this)">
+                  <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                  <img class="absolute inset-0 w-full h-full object-cover hidden rounded-full" alt="Ejecutivo de Cuentas">
+                  <div class="image-upload-placeholder-icon text-slate-400 group-hover/img:text-sky-400 transition-colors flex flex-col items-center p-1">
+                    <i class="fa-solid fa-user-tie text-xl"></i>
+                    <span class="text-[7px] font-bold mt-1">FOTO EJECUTIVO</span>
+                  </div>
+                </div>
+
+                <div class="z-10 relative flex-grow">
+                  <span class="text-xs text-sky-400 uppercase tracking-widest font-semibold block mb-1">Contacto Comercial Directo</span>
+                  <h3 class="text-lg font-bold" contenteditable="true">Nombre del Ejecutivo</h3>
+                  <p class="text-xs text-slate-400 mb-3" contenteditable="true">tucorreo@mcielectronics.cl • Tu cargo</p>
+                  
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] border-t border-slate-800 pt-3">
+                    <div class="space-y-1.5">
+                      <p class="flex items-center gap-2">
+                        <i class="fa-solid fa-envelope text-sky-400"></i>
+                        <span class="font-semibold" contenteditable="true">ingenieria@mcielectronics.cl</span>
+                      </p>
+                      <p class="flex items-center gap-2">
+                        <i class="fa-solid fa-phone text-sky-400"></i>
+                        <span contenteditable="true">+56 223339579</span>
+                      </p>
+                    </div>
+                    <div class="space-y-1.5">
+                      <p class="flex items-center gap-2">
+                        <i class="fa-solid fa-location-dot text-sky-400"></i>
+                        <span contenteditable="true">Luis Thayer Ojeda 0115, Providencia, Chile</span>
+                      </p>
+                      <p class="flex items-center gap-2">
+                        <i class="fa-solid fa-globe text-sky-400"></i>
+                        <span contenteditable="true">www.mcielectronics.cl</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <div class="border-t border-slate-100 pt-4 flex justify-between items-center text-[10px] text-slate-400 mt-6">
+            <p contenteditable="true">MCI Electronics • Soluciones de Telemetría e Ingeniería</p>
+            <p>Página 6</p>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- INTERACTIVE JS FOR BUILDING AND IMAGE UPLOADING -->
+  <script>
+    // Generador de Controles de Bloque (Move, Duplicate, Delete)
+    // Para interactuar con los bloques que se agregan o duplican
+    function getControlsHTML() {
+      return `
+        <div class="block-controls absolute -top-3 -right-2 bg-slate-950/95 text-white text-[10px] py-1 px-2.5 rounded-lg shadow-xl flex items-center gap-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-150 z-20 no-print border border-slate-800">
+          <button onclick="moveBlock(this, 'up')" class="hover:text-sky-400 transition-colors" title="Mover Arriba"><i class="fa-solid fa-arrow-up"></i></button>
+          <button onclick="moveBlock(this, 'down')" class="hover:text-sky-400 transition-colors" title="Mover Abajo"><i class="fa-solid fa-arrow-down"></i></button>
+          <button onclick="duplicateBlock(this)" class="hover:text-emerald-400 transition-colors" title="Duplicar"><i class="fa-solid fa-copy"></i></button>
+          <button onclick="deleteBlock(this)" class="hover:text-red-400 transition-colors" title="Eliminar"><i class="fa-solid fa-trash"></i></button>
+        </div>
+      `;
+    }
+
+    // Inicializa controles de bloque en todos los bloques estáticos cargados por defecto
+    document.addEventListener("DOMContentLoaded", function() {
+      const blocks = document.querySelectorAll('.mci-block');
+      blocks.forEach(block => {
+        if (!block.querySelector('.block-controls')) {
+          block.insertAdjacentHTML('afterbegin', getControlsHTML());
+        }
+      });
+    });
+
+    // Desplazamiento rápido entre páginas usando el menú del constructor
+    function scrollToPage(pageNumber) {
+      const pageElement = document.getElementById(`brochure-page-${pageNumber}`);
+      if (pageElement) {
+        pageElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Acción: Duplicar Bloque
+    function duplicateBlock(button) {
+      const block = button.closest('.mci-block');
+      if (!block) return;
+      const clone = block.cloneNode(true);
+      
+      // Resetea los inputs de archivo locales para evitar comportamientos cruzados
+      const fileInput = clone.querySelector('input[type="file"]');
+      if (fileInput) fileInput.value = '';
+      
+      const img = clone.querySelector('img');
+      if (img) {
+        img.src = '';
+        img.classList.add('hidden');
+      }
+      
+      const placeholder = clone.querySelector('.image-upload-placeholder-icon');
+      if (placeholder) {
+        placeholder.classList.remove('hidden');
+      }
+
+      // Reinserción con animación visual
+      block.parentNode.insertBefore(clone, block.nextSibling);
+    }
+
+    // Acción: Eliminar Bloque
+    function deleteBlock(button) {
+      const block = button.closest('.mci-block');
+      if (block) {
+        block.remove();
+      }
+    }
+
+    // Acción: Reordenar Bloques
+    function moveBlock(button, direction) {
+      const block = button.closest('.mci-block');
+      if (!block) return;
+      const parent = block.parentNode;
+      
+      if (direction === 'up') {
+        const prev = block.previousElementSibling;
+        if (prev && prev.classList.contains('mci-block')) {
+          parent.insertBefore(block, prev);
+        }
+      } else if (direction === 'down') {
+        const next = block.nextElementSibling;
+        if (next && next.classList.contains('mci-block')) {
+          parent.insertBefore(next, block);
+        }
+      }
+    }
+
+    // Acción: Añadir nuevos componentes en caliente (Modo Page Builder)
+    function addComponent(type) {
+      const targetId = document.getElementById('target-page-select').value;
+      const targetContainer = document.getElementById(targetId);
+      if (!targetContainer) return;
+      
+      let html = '';
+      if (type === 'title') {
+        html = `
+          <div class="mci-block relative group rounded-xl p-2 my-3">
+            <h3 class="text-lg font-bold text-slate-900" contenteditable="true">Nuevo Título de Sección</h3>
+            <div class="accent-bar w-16 mt-1 rounded"></div>
+          </div>
+        `;
+      } else if (type === 'paragraph') {
+        html = `
+          <div class="mci-block relative group rounded-xl p-2 my-2">
+            <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">Haz doble clic aquí para escribir el nuevo contenido de tu sección o propuesta comercial.</p>
+          </div>
+        `;
+      } else if (type === 'card') {
+        html = `
+          <div class="mci-block relative group rounded-xl p-2 my-2">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100 flex gap-3 items-center">
+              <div class="w-20 h-20 bg-slate-200 border border-slate-300 rounded-lg flex-shrink-0 relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+                <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+                <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="Nueva Foto">
+                <div class="image-upload-placeholder-icon text-slate-500 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
+                  <i class="fa-solid fa-camera text-base"></i>
+                  <span class="text-[8px] font-bold mt-1">FOTO</span>
+                </div>
+              </div>
+              <div class="flex-grow">
+                <h4 class="font-bold text-xs uppercase text-slate-900" contenteditable="true">Nueva Solución / Dispositivo</h4>
+                <p class="text-[10px] text-slate-600 mt-1" contenteditable="true">Describe las características principales de este equipo o servicio.</p>
+              </div>
+            </div>
+          </div>
+        `;
+      } else if (type === 'image') {
+        html = `
+          <div class="mci-block relative group rounded-xl p-2 my-3">
+            <div class="w-full h-48 bg-slate-100 border border-slate-200 rounded-xl relative overflow-hidden group/img cursor-pointer flex flex-col justify-center items-center text-center" onclick="triggerImageUpload(this)">
+              <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
+              <img class="absolute inset-0 w-full h-full object-cover hidden rounded-xl" alt="Gráfico/Imagen">
+              <div class="image-upload-placeholder-icon text-slate-400 group-hover/img:text-blue-600 transition-colors flex flex-col items-center gap-2">
+                <i class="fa-regular fa-image text-3xl"></i>
+                <span class="text-xs font-semibold">Subir Gráfica de Dashboard o Foto de Faena</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Convertimos el string HTML a Elemento real para inyectarle el control bar
+      const tempDiv = document.createElement('div');
+      tempDiv.innerHTML = html.trim();
+      const newBlock = tempDiv.firstChild;
+      newBlock.insertAdjacentHTML('afterbegin', getControlsHTML());
+      
+      targetContainer.appendChild(newBlock);
+      
+      // Auto desplazamiento sutil hacia la sección modificada para confirmar la inserción
+      newBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Acción: Subida de imágenes reactiva
+    function triggerImageUpload(container) {
+      const fileInput = container.querySelector('input[type="file"]');
+      if (fileInput) {
+        fileInput.click();
+      }
+    }
+
+    function handleImageChange(event, inputElement) {
+      const file = event.target.files[0];
+      if (file) {
+        const container = inputElement.parentElement;
+        const imgElement = container.querySelector('img');
+        const placeholderIcon = container.querySelector('.image-upload-placeholder-icon');
+
+        if (imgElement && file.type.startsWith('image/')) {
+          const imageUrl = URL.createObjectURL(file);
+          imgElement.src = imageUrl;
+          imgElement.classList.remove('hidden');
+          
+          if (placeholderIcon) {
+            placeholderIcon.classList.add('hidden');
+          }
+          
+          container.classList.remove('border-dashed');
+          container.classList.add('border-solid');
+        }
+      }
+    }
+
+    // Acción: Guardar plantilla (Descarga un clon del HTML limpio con textos guardados)
+    function downloadEditedHTML() {
+      // Duplicamos el DOM completo
+      const docClone = document.documentElement.cloneNode(true);
+      
+      // Limpiamos referencias de imágenes con blob (que al volver a abrir se verían rotas)
+      const images = docClone.querySelectorAll('img');
+      images.forEach(img => {
+        if (img.src.startsWith('blob:')) {
+          img.src = '';
+          img.classList.add('hidden');
+          const container = img.parentElement;
+          const placeholder = container.querySelector('.image-upload-placeholder-icon');
+          if (placeholder) placeholder.classList.remove('hidden');
+          container.classList.remove('border-solid');
+          container.classList.add('border-dashed');
+        }
+      });
+      
+      // Exportamos el archivo como un nuevo documento HTML autoinstalable
+      const htmlContent = "<!DOCTYPE html>\n" + docClone.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'brochure_mci_personalizado_editable.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
