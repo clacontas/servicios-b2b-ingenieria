@@ -1,51 +1,56 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brochure Digital</title>
-    <!-- Incluimos Firebase desde el CDN oficial -->
-    <script type="module">
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
-        import { getAuth, signInAnonymously, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
-        import { getFirestore, doc, setDoc } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MCI Electronics - Brochure</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 
-        // --- TUS CREDENCIALES (Cópialas de Firebase aquí) ---
-        const firebaseConfig = {
-            apiKey: "TU_API_KEY",
-            authDomain: "TU_PROYECTO.firebaseapp.com",
-            projectId: "TU_PROYECTO",
-            storageBucket: "TU_PROYECTO.appspot.com",
-            messagingSenderId: "TU_ID",
-            appId: "TU_APP_ID"
-        };
+  <!-- Firebase SDK -->
+  <script type="module">
+    import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getFirestore, doc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
 
-        const app = initializeApp(firebaseConfig);
+    window.firebaseInit = { initializeApp, getApps, getFirestore, doc, setDoc, getAuth, signInAnonymously };
+  </script>
+</head>
+<body class="bg-slate-50">
+
+  <!-- Contenedor del QR -->
+  <div class="p-8 flex flex-col items-center">
+    <h2 class="text-lg font-bold mb-4">Contacto MCI Electronics</h2>
+    <canvas id="qr-code" class="bg-white p-2 border rounded-lg"></canvas>
+  </div>
+
+  <script>
+    // Inicialización del QR
+    window.onload = function() {
+      new QRious({
+        element: document.getElementById('qr-code'),
+        value: 'https://ing.mcielectronics.cl/contacto-2/',
+        size: 200
+      });
+    };
+
+    // Lógica Firebase corregida
+    window.connectToCloud = async function(config) {
+      const { initializeApp, getApps, getFirestore, doc, setDoc, getAuth, signInAnonymously } = window.firebaseInit;
+      try {
+        const app = !getApps().length ? initializeApp(config) : getApps()[0];
         const auth = getAuth(app);
         const db = getFirestore(app);
-
-        // Función para asegurar la conexión antes de guardar
-        async function conectarYGuardar(datos) {
-            onAuthStateChanged(auth, async (user) => {
-                if (!user) {
-                    await signInAnonymously(auth);
-                }
-                // Aquí ejecutas tu lógica de guardado a Firestore
-                console.log("Conectado con éxito");
-            });
-        }
-
-        // Llama a esto cuando el usuario presione "Guardar"
-        window.guardarCambios = async (datos) => {
-            await conectarYGuardar();
-            // Ejemplo de guardado:
-            // await setDoc(doc(db, "brochures", "tu_documento"), datos);
-        };
-    </script>
-</head>
-<body>
-    <h1>Tu Brochure Digital</h1>
-    <p>La conexión a la nube está integrada.</p>
-    <button onclick="guardarCambios()">Guardar en la Nube</button>
+        
+        await signInAnonymously(auth);
+        console.log("Firebase conectado exitosamente.");
+        alert("¡Conexión establecida con la nube!");
+      } catch (err) {
+        console.error("Error al conectar:", err);
+        alert("Error: Verifica tu configuración de Firebase.");
+      }
+    };
+  </script>
 </body>
 </html>
