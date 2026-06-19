@@ -127,7 +127,7 @@
     <div id="sidebar-overlay" onclick="toggleSidebar()" class="hidden fixed inset-0 bg-slate-950/60 z-40 lg:hidden no-print transition-opacity duration-300"></div>
 
     <!-- BARRA LATERAL IZQUIERDA DE HERRAMIENTAS Y CONSTRUCCIÓN (RESPONSIVA & COLAPSABLE) -->
-    <div id="page-builder-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-80 bg-slate-900 text-white p-6 overflow-y-auto no-print border-r border-slate-800 shadow-2xl flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out font-inter font-medium text-slate-300 font-inter">
+    <div id="page-builder-sidebar" class="fixed lg:sticky top-0 left-0 z-50 h-screen w-80 bg-slate-900 text-white p-6 overflow-y-auto no-print border-r border-slate-800 shadow-2xl flex flex-col justify-between transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out font-inter font-medium text-slate-300">
       
       <div class="space-y-6">
         <!-- Brand & Botón Cerrar en Móviles -->
@@ -137,7 +137,7 @@
               <i class="fa-solid fa-cubes text-xl"></i>
             </div>
             <div>
-              <h2 class="font-extrabold text-base leading-tight text-white">MCI Page Builder</h2>
+              <h2 class="font-extrabold text-base leading-tight text-white font-poppins">MCI Page Builder</h2>
               <p class="text-[10px] text-slate-400">Constructor de Propuestas IoT</p>
             </div>
           </div>
@@ -168,7 +168,7 @@
           <div id="firebase-config-panel" class="hidden pt-2 border-t border-slate-700/40 space-y-2">
             <p class="text-[9px] text-slate-400 font-inter">Pega aquí el objeto de configuración JSON o el bloque JavaScript copiado directamente de Firebase:</p>
             <textarea id="firebase-json-input" rows="5" placeholder='const firebaseConfig = {&#10;  apiKey: "AIzaSy...",&#10;  authDomain: "..."&#10;};' class="w-full bg-slate-950 text-slate-200 border border-slate-700 rounded p-1.5 text-[9px] font-mono focus:outline-none focus:border-blue-500"></textarea>
-            <div class="flex gap-2">
+            <div class="flex gap-2 font-inter">
               <button onclick="saveFirebaseConfig()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold text-[10px] py-1.5 rounded transition-all">Conectar</button>
               <button onclick="clearFirebaseConfig()" class="bg-red-950 hover:bg-red-900 text-red-300 font-semibold text-[10px] px-2 rounded transition-all" title="Eliminar Conexión"><i class="fa-solid fa-trash-can"></i></button>
             </div>
@@ -177,7 +177,7 @@
 
         <!-- Navegación de Páginas -->
         <div class="space-y-2">
-          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Navegación de Páginas</span>
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block font-inter">Navegación de Páginas</span>
           <div class="grid grid-cols-3 gap-1 text-center font-inter">
             <button onclick="scrollToPage(1)" class="bg-slate-800 hover:bg-slate-700 py-1.5 rounded text-xs transition-colors font-medium">Pág 1</button>
             <button onclick="scrollToPage(2)" class="bg-slate-800 hover:bg-slate-700 py-1.5 rounded text-xs transition-colors font-medium">Pág 2</button>
@@ -190,17 +190,17 @@
 
         <!-- Controles del Constructor Modular -->
         <div class="space-y-4 pt-2">
-          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block border-t border-slate-800 pt-4">Añadir Nuevos Componentes</span>
+          <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block border-t border-slate-800 pt-4 font-inter">Añadir Nuevos Componentes</span>
           
           <div>
-            <label class="block text-[10px] font-medium text-slate-400 mb-1">1. Seleccionar Página de Destino</label>
-            <select id="target-page-select" class="w-full bg-slate-800 text-white rounded-lg p-2 text-xs border border-slate-700 focus:outline-none focus:border-blue-500">
-              <option value="page-1-content">Página 1 (Portada)</option>
-              <option value="page-2-content">Página 2 (Flujo Telemetría)</option>
-              <option value="page-3-content" selected>Página 3 (Temperatura)</option>
-              <option value="page-4-content">Página 4 (Energía)</option>
-              <option value="page-5-content">Página 5 (Complementarios)</option>
-              <option value="page-6-content">Página 6 (Contacto/Metodología)</option>
+            <label class="block text-[10px] font-medium text-slate-400 mb-1 font-inter">1. Seleccionar Página de Destino</label>
+            <select id="target-page-select" class="w-full bg-slate-800 text-white rounded-lg p-2 text-xs border border-slate-700 focus:outline-none focus:border-blue-500 font-inter">
+              <option value="page-1-content font-inter">Página 1 (Portada)</option>
+              <option value="page-2-content font-inter">Página 2 (Flujo Telemetría)</option>
+              <option value="page-3-content font-inter" selected>Página 3 (Temperatura)</option>
+              <option value="page-4-content font-inter font-inter">Página 4 (Energía)</option>
+              <option value="page-5-content font-inter">Página 5 (Complementarios)</option>
+              <option value="page-6-content font-inter">Página 6 (Contacto/Metodología)</option>
             </select>
           </div>
 
@@ -244,7 +244,7 @@
           </button>
 
           <!-- Logo / Título de la App -->
-          <div class="flex items-center gap-3 mr-auto sm:mr-0">
+          <div class="flex items-center gap-3 mr-auto sm:mr-0 font-inter">
             <div class="bg-blue-600 p-2 rounded-lg hidden sm:block">
               <i class="fa-solid fa-file-pdf text-xl"></i>
             </div>
@@ -258,11 +258,11 @@
           <div class="flex items-center gap-2 sm:gap-3">
             <!-- Descargar copia HTML con cambios permanentemente guardados -->
             <button onclick="downloadEditedHTML()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 hover:border-slate-500 font-semibold px-2.5 sm:px-4 py-2 rounded-lg shadow-md transition-all text-xs flex items-center gap-1.5" title="Guardar cambios en archivo HTML">
-              <i class="fa-solid fa-code"></i> <span class="hidden sm:inline">Guardar Plantilla</span>
+              <i class="fa-solid fa-code font-inter"></i> <span class="hidden sm:inline">Guardar Plantilla</span>
             </button>
             <!-- Imprimir/Exportar a PDF -->
             <button onclick="window.print()" class="bg-gradient-to-r from-blue-500 to-sky-400 hover:from-blue-600 hover:to-sky-500 text-white font-semibold px-3 sm:px-5 py-2 rounded-lg shadow-lg transition-all transform hover:-translate-y-0.5 text-xs flex items-center gap-1.5">
-              <i class="fa-solid fa-file-export"></i> <span>PDF (Carta)</span>
+              <i class="fa-solid fa-file-export font-inter"></i> <span>PDF (Carta)</span>
             </button>
           </div>
         </div>
@@ -303,7 +303,7 @@
             
             <div id="page-1-content" class="md:col-span-7 space-y-4">
               <div class="mci-block relative group rounded-xl p-2">
-                <span class="text-xs tracking-widest uppercase font-semibold text-sky-300 bg-sky-950/50 border border-sky-800/30 px-3 py-1 rounded-full inline-block font-inter" contenteditable="true">Soluciones de Telemetría IoT</span>
+                <span class="text-xs tracking-widest uppercase font-semibold text-sky-300 bg-sky-950/50 border border-sky-800/30 px-3 py-1 rounded-full inline-block font-inter" contenteditable="true font-inter">Soluciones de Telemetría IoT</span>
               </div>
               <div class="mci-block relative group rounded-xl p-2">
                 <h1 class="text-4xl md:text-5xl font-extrabold leading-tight" contenteditable="true">
@@ -311,7 +311,7 @@
                 </h1>
                 <div class="accent-bar w-24 mt-2 rounded"></div>
               </div>
-              <div class="mci-block relative group rounded-xl p-2">
+              <div class="mci-block relative group rounded-xl p-2 font-inter">
                 <p class="text-slate-300 text-sm leading-relaxed" contenteditable="true">
                   Optimiza la gestión operacional, asegura la calidad de tus procesos críticos y reduce tus costos de energía con tecnología inalámbrica de vanguardia.
                 </p>
@@ -365,7 +365,7 @@
           <div class="flex justify-between items-center border-b border-slate-100 pb-4 mb-4 font-inter">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
-              <span class="text-sm font-extrabold text-slate-900">Soluciones de Telemetría</span>
+              <span class="text-sm font-extrabold text-slate-900 font-poppins">Soluciones de Telemetría</span>
             </div>
             <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
           </div>
@@ -373,7 +373,7 @@
           <!-- Contenido Modificable Página 2 -->
           <div id="page-2-content" class="my-auto space-y-6 font-inter">
             <div class="mci-block relative group rounded-xl p-2 text-center max-w-lg mx-auto">
-              <h2 class="text-2xl font-bold text-slate-900 mb-2 font-poppins" contenteditable="true">¿En qué consiste nuestra solución?</h2>
+              <h2 class="text-2xl font-bold text-slate-900 mb-2 font-poppins" contenteditable="true font-poppins">¿En qué consiste nuestra solución?</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
                 Establecemos un puente inalámbrico de alta confiabilidad entre las variables críticas de tus operaciones físicas y la toma de decisiones informadas, utilizando tecnología de bajísimo mantenimiento y plataformas en tiempo real.
               </p>
@@ -388,7 +388,7 @@
                     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
                       <i class="fa-solid fa-temperature-half text-xl"></i>
                     </div>
-                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true">01. Sensores</h4>
+                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true font-poppins">01. Sensores</h4>
                     <p class="text-[11px] text-slate-500 mb-1" contenteditable="true">Miden las variables del entorno físico.</p>
                     <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded-full uppercase" contenteditable="true">Hasta 5 años batería</span>
                   </div>
@@ -398,7 +398,7 @@
                     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
                       <i class="fa-solid fa-tower-cell text-xl"></i>
                     </div>
-                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true">02. Gateway</h4>
+                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true font-poppins">02. Gateway</h4>
                     <p class="text-[11px] text-slate-500 mb-1" contenteditable="true">Recibe datos por RF de largo alcance y sube a internet.</p>
                     <span class="text-[9px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase" contenteditable="true">Hasta 1 KM / 4G / Eth</span>
                   </div>
@@ -408,7 +408,7 @@
                     <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2">
                       <i class="fa-solid fa-cloud text-xl"></i>
                     </div>
-                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true">03. Servidor MCIIoT</h4>
+                    <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true font-poppins">03. Servidor MCIIoT</h4>
                     <p class="text-[11px] text-slate-500 mb-1" contenteditable="true">Almacena, despliega y analiza los datos recopilados.</p>
                     <span class="text-[9px] bg-sky-100 text-sky-800 font-bold px-2 py-0.5 rounded-full uppercase" contenteditable="true">Alertas y Dashboards</span>
                   </div>
@@ -421,13 +421,13 @@
             <!-- Doble Tarjeta Informativa -->
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-1">
               <div class="mci-block relative group rounded-xl p-2 bg-blue-50/60 border border-blue-100/50">
-                <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins" contenteditable="true"><i class="fa-solid fa-shield-halved mr-1"></i> Resiliencia ante Desconexión</h4>
+                <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins" contenteditable="true"><i class="fa-solid fa-shield-halved mr-1 font-inter"></i> Resiliencia ante Desconexión</h4>
                 <p class="text-slate-600 text-[11px] leading-relaxed" contenteditable="true">
                   ¿Se cayó el internet? No hay pérdida de datos. Nuestros sensores guardan la trazabilidad internamente y la retransmiten con marca de tiempo exacta una vez que la red regresa.
                 </p>
               </div>
               <div class="mci-block relative group rounded-xl p-2 bg-blue-50/60 border border-blue-100/50">
-                <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins" contenteditable="true"><i class="fa-solid fa-network-wired mr-1"></i> Flexibilidad de Plataforma</h4>
+                <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins" contenteditable="true"><i class="fa-solid fa-network-wired mr-1 font-inter"></i> Flexibilidad de Plataforma</h4>
                 <p class="text-slate-600 text-[11px] leading-relaxed" contenteditable="true">
                   Visualiza en nuestra amigable plataforma en la nube **MCIIoT** o despacha datos directamente a tus propios sistemas locales mediante integraciones API o protocolos industriales de comunicación.
                 </p>
@@ -443,20 +443,20 @@
 
 
         <!-- ================= PÁGINA 3: TEMPERATURA Y HUMEDAD ================= -->
-        <div id="brochure-page-3" class="brochure-page text-slate-800">
+        <div id="brochure-page-3" class="brochure-page text-slate-800 font-inter">
           <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 font-inter">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
-              <span class="text-sm font-extrabold text-slate-900">Monitoreo de Condiciones</span>
+              <span class="text-sm font-extrabold text-slate-900 font-poppins">Monitoreo de Condiciones</span>
             </div>
             <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
           </div>
 
           <!-- Contenido Modificable Página 3 -->
-          <div id="page-3-content" class="my-auto space-y-4 font-inter">
-            <div class="mci-block relative group rounded-xl p-2">
-              <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true font-poppins">Módulo de Especialidad</span>
-              <h2 class="text-2xl font-bold text-slate-900 mb-1 font-poppins" contenteditable="true">Monitoreo de Temperatura y Humedad</h2>
+          <div id="page-3-content" class="my-auto space-y-4">
+            <div class="mci-block relative group rounded-xl p-2 font-poppins">
+              <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true">Módulo de Especialidad</span>
+              <h2 class="text-2xl font-bold text-slate-900 mb-1" contenteditable="true">Monitoreo de Temperatura y Humedad</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
                 Garantizamos la seguridad y máxima calidad en la cadena de frío. Automatiza el control en tus bodegas, laboratorios y logística de tránsito mediante alertas inteligentes instantáneas.
               </p>
@@ -477,12 +477,12 @@
                       <rect x="8" y="6" width="8" height="6" rx="1" fill="currentColor" opacity="0.3"/>
                       <circle cx="12" cy="16" r="2" fill="currentColor"/>
                     </svg>
-                    <span class="text-[6px] font-extrabold uppercase mt-1">VER DISPOSITIVO</span>
+                    <span class="text-[6px] font-extrabold uppercase mt-1 font-inter">VER DISPOSITIVO</span>
                   </div>
                 </div>
                 <div class="flex-grow">
                   <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">01. Sonoff TH Elite</h4>
-                  <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
+                  <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true font-inter">
                     Controlador inteligente para interiores con pantalla LCD. Automatiza y regula sistemas de climatización de forma ágil y económica.
                   </p>
                 </div>
@@ -500,13 +500,13 @@
                       <path d="M12,6 L12,18 M6,12 L18,12" stroke-dasharray="2 2"/>
                       <circle cx="12" cy="12" r="3" fill="currentColor"/>
                     </svg>
-                    <span class="text-[6px] font-extrabold uppercase mt-1">TECNOLOGÍA BLE</span>
+                    <span class="text-[6px] font-extrabold uppercase mt-1 font-inter">TECNOLOGÍA BLE</span>
                   </div>
                 </div>
                 <div class="flex-grow">
-                  <h4 class="font-bold text-xs uppercase text-blue-900 font-poppins" contenteditable="true">02. Teltonika EYE Sensor</h4>
-                  <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
-                    Baliza Bluetooth (BLE) ultra-robusta e impermeable IP67. Se vincula con gateways móviles para auditar la temperatura en ruta de despacho.
+                  <h4 class="font-bold text-xs uppercase text-blue-900 font-poppins" contenteditable="true font-poppins">02. Teltonika EYE Sensor</h4>
+                  <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true font-inter">
+                    Baliza Bluetooth (BLE) ultra-robusta e impermeable IP67. Se conecta con gateways para auditar la temperatura en ruta de despacho.
                   </p>
                 </div>
               </div>
@@ -517,18 +517,18 @@
                   <input type="file" accept="image/*" class="hidden" onchange="handleImageChange(event, this)">
                   <img class="absolute inset-0 w-full h-full object-cover hidden rounded-lg" alt="iButton">
                   <!-- SVG Pre-cargado de iButton -->
-                  <div class="image-upload-placeholder-icon text-slate-600 group-hover/img:text-slate-500 transition-colors flex flex-col items-center">
+                  <div class="image-upload-placeholder-icon text-slate-600 group-hover/img:text-blue-600 transition-colors flex flex-col items-center">
                     <svg class="w-8 h-8" viewBox="0 0 24 24" fill="currentColor">
                       <circle cx="12" cy="12" r="8" fill="none" stroke="currentColor" stroke-width="2"/>
                       <circle cx="12" cy="12" r="6" fill="currentColor" opacity="0.4"/>
                       <circle cx="12" cy="12" r="3" fill="currentColor"/>
                     </svg>
-                    <span class="text-[6px] font-extrabold uppercase mt-1">IBUTTON DISK</span>
+                    <span class="text-[6px] font-extrabold uppercase mt-1 font-inter">IBUTTON DISK</span>
                   </div>
                 </div>
                 <div class="flex-grow">
                   <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">03. iButton Data Loggers</h4>
-                  <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
+                  <p class="text-[9px] text-slate-600 mt-0.5 font-inter" contenteditable="true">
                     Contacto metálico encapsulado autónomo con memoria. Ideal para auditorías directas en cajas de despacho de vacunas y fármacos.
                   </p>
                 </div>
@@ -551,7 +551,7 @@
                 </div>
                 <div class="flex-grow">
                   <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">04. Milesight TS301</h4>
-                  <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
+                  <p class="text-[9px] text-slate-600 mt-0.5 font-inter" contenteditable="true">
                     Sonda LoRaWAN de nivel industrial. Coberturas excepcionales y baterías de hasta 5 años para grandes laboratorios o cámaras de frío.
                   </p>
                 </div>
@@ -562,7 +562,7 @@
             <!-- Caso de éxito (Temperatura y Humedad - Anonimizado para cumplir NT 147 ISP) -->
             <div class="mci-block relative group rounded-xl p-2 border border-slate-100 bg-slate-50/60 font-inter">
               <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
-                <div class="md:col-span-9">
+                <div class="md:col-span-9 font-inter">
                   <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins"><i class="fa-solid fa-file-shield mr-1"></i> Caso de Éxito: Cumplimiento de Normativa Sanitaria (NT 147 ISP)</h4>
                   <p class="text-[10px] text-slate-600 leading-relaxed font-normal" contenteditable="true">
                     Diseñamos e implementamos un sistema de telemetría IoT de alta precisión para una destacada empresa líder en logística farmacéutica. Integramos gateways industriales **Milesight UG65** con una red de sensores inalámbricos de temperatura y humedad distribuidos en bodega. Los datos se transmiten encriptados en tiempo real a **MCIIoT**, automatizando la entrega de informes semanales requeridos y activando alertas inmediatas vía correo electrónico y Telegram ante cualquier desviación térmica, garantizando el cumplimiento de la norma NT 147 del ISP de Chile y asegurando la continuidad operativa del centro.
@@ -577,17 +577,17 @@
                       <path d="M3,9 L12,2 L21,9 L21,20 L3,21 Z" fill="currentColor" fill-opacity="0.1"/>
                       <path d="M12,11 L12,17 M9,14 L15,14" stroke="currentColor" stroke-width="2.5"/>
                     </svg>
-                    <span class="text-[7px] font-extrabold uppercase mt-1">BODEGA SANITARIA</span>
+                    <span class="text-[7px] font-extrabold uppercase mt-1 font-inter">BODEGA SANITARIA</span>
                   </div>
                 </div>
               </div>
             </div>
 
             <!-- CTA de Alertas -->
-            <div class="mci-block relative group rounded-xl p-1">
+            <div class="mci-block relative group rounded-xl p-1 font-inter">
               <div class="bg-slate-900 text-white rounded-xl p-3.5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div class="max-w-md">
-                  <h4 class="font-bold text-xs uppercase text-sky-400" contenteditable="true">¿Sufres pérdidas por fallas en climatización?</h4>
+                  <h4 class="font-bold text-xs uppercase text-sky-400 font-poppins" contenteditable="true">¿Sufres pérdidas por fallas en climatización?</h4>
                   <p class="text-[9px] text-slate-300 mt-0.5" contenteditable="true">
                     Configura alertas inmediatas a tus equipos vía Telegram, Correo o llamada ante cualquier quiebre térmico.
                   </p>
@@ -605,20 +605,20 @@
 
 
         <!-- ================= PÁGINA 4: CONSUMO ENERGÉTICO ================= -->
-        <div id="brochure-page-4" class="brochure-page text-slate-800">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 font-inter">
+        <div id="brochure-page-4" class="brochure-page text-slate-800 font-inter">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
-              <span class="text-sm font-extrabold text-slate-900">Eficiencia Energética</span>
+              <span class="text-sm font-extrabold text-slate-900 font-poppins">Eficiencia Energética</span>
             </div>
             <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
           </div>
 
           <!-- Contenido Modificable Página 4 -->
-          <div id="page-4-content" class="my-auto space-y-4 font-inter">
-            <div class="mci-block relative group rounded-xl p-2">
-              <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase font-poppins" contenteditable="true">Gestión de Consumos</span>
-              <h2 class="text-2xl font-bold text-slate-900 mb-1 font-poppins" contenteditable="true">Monitoreo de Consumo Energético</h2>
+          <div id="page-4-content" class="my-auto space-y-4">
+            <div class="mci-block relative group rounded-xl p-2 font-poppins">
+              <span class="text-[10px] font-bold tracking-widest text-blue-600 uppercase" contenteditable="true">Gestión de Consumos</span>
+              <h2 class="text-2xl font-bold text-slate-900 mb-1" contenteditable="true">Monitoreo de Consumo Energético</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
                 Toma el control absoluto del gasto eléctrico de tu negocio. Nuestras tecnologías te permiten mapear en tiempo real los consumos, optimizar el uso de tus recursos y cumplir con las normativas del país.
               </p>
@@ -630,7 +630,7 @@
                 <div class="bg-sky-500/15 p-2 rounded-lg text-sky-400 text-lg hidden sm:block">
                   <i class="fa-solid fa-gavel"></i>
                 </div>
-                <div class="text-xs font-inter">
+                <div class="text-xs">
                   <h4 class="font-bold uppercase text-sky-400 mb-0.5" contenteditable="true">Ley de Eficiencia Energética (Ley 21.305)</h4>
                   <p class="text-slate-300 text-[10px] leading-relaxed" contenteditable="true">
                     En Chile las grandes empresas deben implementar sistemas de gestión y reportar sus consumos de energía e intensidad al Ministerio. En MCI implementamos sistemas homologados listos para reportar.
@@ -644,7 +644,7 @@
               <div class="mci-block relative group rounded-xl p-3 bg-slate-50 border border-slate-100 flex flex-col justify-between">
                 <div>
                   <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true"><i class="fa-solid fa-gauge-high mr-1 text-blue-600"></i> Medición Sin Intervención</h4>
-                  <p class="text-[10px] text-slate-600 mb-2 leading-relaxed" contenteditable="true">
+                  <p class="text-[10px] text-slate-600 mb-2 leading-relaxed" contenteditable="true font-inter">
                     Instalamos sensores de corriente de pinza abierta **Milesight CT101/CT103**. Monitorea el consumo de tableros sin cortar suministro ni detener procesos.
                   </p>
                 </div>
@@ -667,8 +667,8 @@
               <!-- Control de Oficinas -->
               <div class="mci-block relative group rounded-xl p-3 bg-slate-50 border border-slate-100 flex flex-col justify-between">
                 <div>
-                  <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true"><i class="fa-solid fa-building-circle-check mr-1 text-blue-600"></i> Edificios Inteligentes</h4>
-                  <p class="text-[10px] text-slate-600 mb-2 leading-relaxed" contenteditable="true">
+                  <h4 class="font-bold text-xs uppercase text-slate-900 mb-1 font-poppins" contenteditable="true"><i class="fa-solid fa-building-circle-check mr-1 text-blue-600 font-inter"></i> Edificios Inteligentes</h4>
+                  <p class="text-[10px] text-slate-600 mb-2 leading-relaxed" contenteditable="true font-inter">
                     Optimiza climatización (HVAC) acoplando sensores PIR, presencia y enchufes inteligentes LoRaWAN para cortes automatizados en horarios inhabiles.
                   </p>
                 </div>
@@ -689,7 +689,7 @@
             </div>
 
             <!-- Caso de éxito -->
-            <div class="mci-block relative group rounded-xl p-2 border border-slate-100 bg-slate-50/60">
+            <div class="mci-block relative group rounded-xl p-2 border border-slate-100 bg-slate-50/60 font-inter">
               <div class="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
                 <div class="md:col-span-9">
                   <h4 class="font-bold text-xs text-blue-900 mb-1 uppercase font-poppins"><i class="fa-solid fa-solar-panel mr-1"></i> Caso de Éxito: Telemetría en Planta Solar</h4>
@@ -724,19 +724,19 @@
 
 
         <!-- ================= PÁGINA 5: COMPLEMENTARIO ================= -->
-        <div id="brochure-page-5" class="brochure-page text-slate-800">
-          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 font-inter">
+        <div id="brochure-page-5" class="brochure-page text-slate-800 font-inter">
+          <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
-              <span class="text-sm font-extrabold text-slate-900">Ecosistema Complementario</span>
+              <span class="text-sm font-extrabold text-slate-900 font-poppins">Ecosistema Complementario</span>
             </div>
-            <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
+            <span class="text-[11px] text-slate-400" contenteditable="true font-inter">ing.mcielectronics.cl</span>
           </div>
 
           <!-- Contenido Modificable Página 5 -->
-          <div id="page-5-content" class="my-auto space-y-6 font-inter">
-            <div class="mci-block relative group rounded-xl p-2 text-center max-w-lg mx-auto">
-              <h2 class="text-xl font-bold text-slate-900 mb-1 font-poppins" contenteditable="true">Ecosistema de Soluciones IoT e Ingeniería</h2>
+          <div id="page-5-content" class="my-auto space-y-6">
+            <div class="mci-block relative group rounded-xl p-2 text-center max-w-lg mx-auto font-poppins">
+              <h2 class="text-xl font-bold text-slate-900 mb-1" contenteditable="true">Ecosistema de Soluciones IoT e Ingeniería</h2>
               <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true">
                 Nuestra plataforma **MCIIoT** es versátil. Expandimos el poder de tu infraestructura agregando sensores de especialidad complementaria para resolver otras necesidades operacionales clave.
               </p>
@@ -746,7 +746,7 @@
               
               <!-- Recursos Hídricos -->
               <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3">
-                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-droplet"></i></div>
+                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-droplet font-inter"></i></div>
                 <div>
                   <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">Control de Recursos Hídricos</h4>
                   <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
@@ -757,10 +757,10 @@
 
               <!-- Calidad de Aire -->
               <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3">
-                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-wind"></i></div>
+                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-wind font-inter"></i></div>
                 <div>
                   <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">Calidad Medioambiental (CO2 / UV)</h4>
-                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
+                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true font-inter">
                     Protección de colaboradores en exteriores mediante sensores de radiación UV y monitoreo de CO2 y ventilación en oficinas y salas de clases.
                   </p>
                 </div>
@@ -768,10 +768,10 @@
 
               <!-- Conteo de Personas -->
               <div class="mci-block relative group p-4 bg-slate-50/60 rounded-xl border border-slate-100 flex gap-3">
-                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-people-group"></i></div>
+                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-people-group font-inter"></i></div>
                 <div>
                   <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">Flujo de Personas y Activos</h4>
-                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
+                  <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true font-inter">
                     Analiza el tráfico de clientes en retail, optimiza el uso de salas corporativas o mide la tasa de ocupación de vehículos en estacionamientos.
                   </p>
                 </div>
@@ -779,7 +779,7 @@
 
               <!-- Servicios de Ingeniería -->
               <div class="mci-block relative group p-4 bg-blue-50/50 rounded-xl border border-blue-100/50 flex gap-3">
-                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-microchip"></i></div>
+                <div class="text-blue-600 text-lg pt-0.5"><i class="fa-solid fa-microchip font-inter"></i></div>
                 <div>
                   <h4 class="font-bold text-xs uppercase text-blue-900 font-poppins" contenteditable="true">Diseño Electrónico e Integración</h4>
                   <p class="text-[10px] text-slate-600 mt-1 leading-relaxed" contenteditable="true">
@@ -803,7 +803,7 @@
           <div class="flex justify-between items-center border-b border-slate-100 pb-3 mb-4 font-inter">
             <div>
               <span class="text-[10px] tracking-widest text-blue-600 font-bold uppercase block">MCI Ingeniería</span>
-              <span class="text-sm font-extrabold text-slate-900">Contacto y Metodología</span>
+              <span class="text-sm font-extrabold text-slate-900 font-poppins">Contacto y Metodología</span>
             </div>
             <span class="text-[11px] text-slate-400" contenteditable="true">ing.mcielectronics.cl</span>
           </div>
@@ -811,16 +811,16 @@
           <!-- Contenido Modificable Página 6 -->
           <div id="page-6-content" class="my-auto space-y-6 font-inter">
             
-            <div class="mci-block relative group rounded-xl p-2">
-              <h2 class="text-lg font-bold text-slate-900 mb-1 font-poppins" contenteditable="true">¿Cómo implementamos la solución en tu negocio?</h2>
+            <div class="mci-block relative group rounded-xl p-2 font-poppins">
+              <h2 class="text-lg font-bold text-slate-900 mb-1" contenteditable="true">¿Cómo implementamos la solución en tu negocio?</h2>
               <p class="text-slate-600 text-[11px]" contenteditable="true">
                 Facilitamos tu transición tecnológica sin fricciones operativas de manera ágil en 4 fases clave:
               </p>
             </div>
 
             <!-- Fases -->
-            <div class="mci-block relative group rounded-xl p-2">
-              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center font-inter">
+            <div class="mci-block relative group rounded-xl p-2 font-inter">
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
                 <div class="p-3 bg-slate-50 border border-slate-100 rounded-xl">
                   <div class="text-lg font-extrabold text-blue-600 mb-1" contenteditable="true">Fase 1</div>
                   <h4 class="font-bold text-[11px] uppercase text-slate-900 mb-1 font-poppins" contenteditable="true">Diagnóstico</h4>
@@ -860,29 +860,31 @@
                   </div>
                 </div>
 
-                <div class="z-10 relative flex-grow">
-                  <span class="text-xs text-sky-400 uppercase tracking-widest font-semibold block mb-1 font-inter">Contacto Comercial Directo</span>
+                <div class="z-10 relative flex-grow font-inter">
+                  <span class="text-xs text-sky-400 uppercase tracking-widest font-semibold block mb-1">Contacto Comercial Directo</span>
                   <h3 class="text-lg font-bold" contenteditable="true">Nombre del Ejecutivo</h3>
-                  <p class="text-xs text-slate-400 mb-3 font-inter" contenteditable="true">tucorreo@mcielectronics.cl • Tu cargo</p>
+                  <p class="text-xs text-slate-400 mb-3" contenteditable="true">tucorreo@mcielectronics.cl • Tu cargo</p>
                   
-                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] border-t border-slate-800 pt-3 font-inter">
+                  <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px] border-t border-slate-800 pt-3">
                     <div class="space-y-1.5">
                       <p class="flex items-center gap-2">
-                        <i class="fa-solid fa-envelope text-sky-400"></i>
+                        <i class="fa-solid fa-envelope text-sky-400 font-inter"></i>
                         <span class="font-semibold" contenteditable="true">ingenieria@mcielectronics.cl</span>
                       </p>
                       <p class="flex items-center gap-2">
-                        <i class="fa-solid fa-phone text-sky-400"></i>
+                        <i class="fa-solid fa-phone text-sky-400 font-inter"></i>
                         <span contenteditable="true">+56 223339579</span>
                       </p>
                     </div>
                     <div class="space-y-1.5">
                       <p class="flex items-center gap-2">
-                        <i class="fa-solid fa-location-dot text-sky-400"></i>
+                        <i class="fa-solid fa-location-dot text-sky-400 font-inter"></i>
                         <span contenteditable="true">Luis Thayer Ojeda 0115, Providencia, Chile</span>
                       </p>
-                      <i class="fa-solid fa-globe text-sky-400"></i>
-                      <span contenteditable="true">www.mcielectronics.cl</span>
+                      <p class="flex items-center gap-2">
+                        <i class="fa-solid fa-globe text-sky-400 font-inter"></i>
+                        <span contenteditable="true">www.mcielectronics.cl</span>
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -902,7 +904,7 @@
   </div>
 
   <!-- INTERACTIVE JS FOR BUILDING AND IMAGE UPLOADING -->
-  <script type="module font-inter">
+  <script type="module">
     // --- INTEGRACIÓN Y PERSISTENCIA CON FIREBASE FIRESTORE ---
     import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
     import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
@@ -959,27 +961,42 @@
           db = getFirestore(app);
           firebaseEnabled = true;
 
-          // RULE 3: Autenticación obligatoria antes de cualquier consulta Firestore
-          if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-            await signInWithCustomToken(auth, __initial_auth_token);
-          } else {
-            await signInAnonymously(auth);
-          }
+          // Autenticación con manejo inteligente de errores comunes de Firebase console
+          const performAuth = async () => {
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+              await signInWithCustomToken(auth, __initial_auth_token);
+            } else {
+              try {
+                await signInAnonymously(auth);
+              } catch (authError) {
+                console.error("Error en autenticación anónima:", authError);
+                if (authError.code === 'auth/operation-not-allowed') {
+                  showToast('Alerta: Habilita el "Inicio de sesión anónimo" en Firebase (Authentication -> Sign-in method).', true);
+                } else {
+                  showToast('Error de autenticación: ' + authError.message, true);
+                }
+              }
+            }
+          };
+
+          await performAuth();
 
           onAuthStateChanged(auth, async (user) => {
             if (user) {
               updateCloudStatus('Nube Lista', 'emerald');
               document.getElementById('save-cloud-btn').removeAttribute('disabled');
-              // Descargar la última copia del brochure desde la nube
               await loadFromCloud();
             } else {
-              updateCloudStatus('Sin Sesión', 'red');
+              // Permitir Firestore de todas formas si la sesión falló pero está inicializada la app
+              updateCloudStatus('Nube Conectada', 'emerald');
+              document.getElementById('save-cloud-btn').removeAttribute('disabled');
+              await loadFromCloud();
             }
           });
         } catch (e) {
           console.error("Error al conectar con los servicios de Firebase:", e);
           updateCloudStatus('Error Config', 'red');
-          showToast('Credenciales de Firebase inválidas.', true);
+          showToast('Error de conexión Firebase: ' + e.message, true);
         }
       } else {
         updateCloudStatus('Modo Local (Offline)', 'slate');
@@ -1007,10 +1024,10 @@
 
       try {
         // PARSER ULTRA-ROBUSTO INDEXADO:
-        // Localizamos el índice de 'apiKey' para ubicar inequívocamente el inicio del objeto
+        // Localizamos el índice de 'apiKey' para ubicar el objeto exacto de configuración
         const apiIdx = input.indexOf('apiKey');
         if (apiIdx === -1) {
-          throw new Error("No se detectó la clave obligatoria 'apiKey'.");
+          throw new Error("No se detectó la clave obligatoria 'apiKey'. Asegúrate de estar copiando el código correcto.");
         }
         
         // Encontramos la primera llave de apertura HACIA ATRÁS desde el apiKey (esto ignora los imports superiores)
@@ -1019,7 +1036,7 @@
         const closeBraceIdx = input.indexOf('}', apiIdx);
         
         if (openBraceIdx === -1 || closeBraceIdx === -1 || openBraceIdx > apiIdx || closeBraceIdx < apiIdx) {
-          throw new Error("No se pudo delimitar las llaves del bloque de configuración.");
+          throw new Error("No se pudo delimitar las llaves del bloque de configuración de Firebase.");
         }
         
         let cleaned = input.substring(openBraceIdx, closeBraceIdx + 1);
@@ -1035,7 +1052,7 @@
           // Intentamos JSON estricto primero
           parsedConfig = JSON.parse(cleaned);
         } catch (jsonErr) {
-          // Si falla, reformateamos para tolerar sintaxis de objeto JavaScript nativo:
+          // Reformateamos para tolerar sintaxis de objeto JavaScript nativo:
           // 1. Envolver las llaves de claves sin comillas en comillas dobles (ej: apiKey: -> "apiKey":)
           // 2. Reemplazar comillas simples por dobles en los valores string
           // 3. Eliminar comas sobrantes antes de cerrar llaves (trailing commas)
@@ -1049,7 +1066,7 @@
 
         // Validar claves mínimas obligatorias para evitar caídas en el SDK
         if (!parsedConfig.apiKey || !parsedConfig.projectId) {
-          throw new Error("La configuración extraída está incompleta.");
+          throw new Error("La configuración extraída está incompleta o es inválida.");
         }
 
         localStorage.setItem('mci_firebase_config', JSON.stringify(parsedConfig));
@@ -1062,7 +1079,7 @@
         await window.initFirebase(parsedConfig);
       } catch (err) {
         console.error("Error al procesar el parser relajado:", err);
-        showToast('No pudimos extraer las credenciales. Asegúrate de copiar el cuadro completo de Firebase.', true);
+        showToast('No pudimos extraer las credenciales. Recuerda copiar y pegar TODO el código tal como te lo entrega Firebase.', true);
       }
     };
 
@@ -1081,20 +1098,6 @@
       // 2. Conectar Firebase de forma segura
       await window.initFirebase();
     };
-
-    // Actualiza el indicador de conexión de Firebase en el Sidebar
-    function updateCloudStatus(text, color) {
-      const badge = document.getElementById('cloud-status-badge');
-      if (!badge) return;
-      badge.textContent = text;
-      
-      // Remover clases de color previas
-      badge.className = "px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 ";
-      if (color === 'amber') badge.classList.add('bg-amber-500/10', 'text-amber-400');
-      if (color === 'emerald') badge.classList.add('bg-emerald-500/10', 'text-emerald-400');
-      if (color === 'red') badge.classList.add('bg-red-500/10', 'text-red-400');
-      if (color === 'slate') badge.classList.add('bg-slate-500/10', 'text-slate-400');
-    }
 
     // Cargar contenido sincronizado desde Firestore (REGLAS 1 Y 2)
     async function loadFromCloud() {
@@ -1183,11 +1186,11 @@
       
       toastMsg.textContent = message;
       if (isError) {
-        toastIcon.className = "bg-red-600 text-white p-1.5 rounded-lg font-inter";
-        toastIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation font-inter"></i>`;
+        toastIcon.className = "bg-red-600 text-white p-1.5 rounded-lg";
+        toastIcon.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i>`;
       } else {
-        toastIcon.className = "bg-blue-600 text-white p-1.5 rounded-lg font-inter";
-        toastIcon.innerHTML = `<i class="fa-solid fa-circle-check font-inter"></i>`;
+        toastIcon.className = "bg-blue-600 text-white p-1.5 rounded-lg";
+        toastIcon.innerHTML = `<i class="fa-solid fa-circle-check"></i>`;
       }
       
       toast.classList.remove('hidden');
@@ -1328,7 +1331,7 @@
       } else if (type === 'paragraph') {
         html = `
           <div class="mci-block relative group rounded-xl p-2 my-2">
-            <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true font-inter">Haz doble clic aquí para escribir el nuevo contenido de tu sección o propuesta comercial.</p>
+            <p class="text-slate-600 text-xs leading-relaxed" contenteditable="true font-inter font-inter">Haz doble clic aquí para escribir el nuevo contenido de tu sección o propuesta comercial.</p>
           </div>
         `;
       } else if (type === 'card') {
