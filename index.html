@@ -110,16 +110,17 @@
         break-after: avoid !important;
       }
 
-      /* Ocultar zonas de carga de imagen vacías */
-      .image-upload-placeholder-icon {
+      /* Ocultar textos e iconos instructivos genéricos, pero MANTENER LOS SVG DIBUJADOS */
+      .image-upload-placeholder-icon span,
+      .image-upload-placeholder-icon p,
+      .image-upload-placeholder-icon i.fa-camera,
+      .image-upload-placeholder-icon i.fa-image {
         display: none !important;
       }
-
-      /* Ocultar el borde de upload en zonas sin imagen */
-      .image-upload-zone,
+      
+      /* Asegurar que las cajas sin foto mantengan su fondo al imprimir */
       [onclick="triggerImageUpload(this)"] {
-        border: none !important;
-        background: transparent !important;
+        border-color: transparent !important; /* Quita el borde en impresión, pero mantiene el fondo azul/gris */
       }
 
       /* Ocultar controles de bloque flotantes */
@@ -579,7 +580,7 @@
                     </div>
                   </div>
                   <div class="flex-grow">
-                    <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">02. Sensores LoRaWAN | Milesight</h4>
+                    <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">04. Sensores LoRaWAN | Milesight</h4>
                     <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
                       Sonda LoRaWAN de nivel industrial. Coberturas excepcionales y baterías de hasta 5 años para grandes laboratorios o cámaras de frío.
                     </p>
@@ -607,9 +608,9 @@
                     </div>
                   </div>
                   <div class="flex-grow">
-                    <h4 class="font-bold text-xs uppercase text-blue-900 font-poppins" contenteditable="true">03. Teltonika EYE Sensor</h4>
+                    <h4 class="font-bold text-xs uppercase text-blue-900 font-poppins" contenteditable="true">02. Teltonika EYE Sensor</h4>
                     <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
-                      Sensor Inalámbrico Multifunción Bluetooth (BLE) ultra-robusto e impermeable IP67. Se vincula con dispositiovs GPS para auditar la temperatura en ruta de despacho.
+                      Baliza Bluetooth (BLE) ultra-robusta e impermeable IP67. Se vincula con gateways móviles para auditar la temperatura en ruta de despacho.
                     </p>
                   </div>
                 </div>
@@ -629,9 +630,9 @@
                     </div>
                   </div>
                   <div class="flex-grow">
-                    <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">04. iButton Data Loggers</h4>
+                    <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">03. iButton Data Loggers</h4>
                     <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
-                      Dispositivo autónomo de registro térmico encapsulado en acero inoxidable, diseñado para soportar entornos industriales exigentes. Ideal para garantizar la integridad en la cadena de frío.
+                      Contacto metálico encapsulado autónomo con memoria. Ideal para auditorías directas en cajas de despacho de vacunas y fármacos.
                     </p>
                   </div>
                 </div>
@@ -1218,15 +1219,26 @@
       newBlock.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
+    // Variables globales para el control de Encuadre (Drag & Zoom)
+    let isDraggingImg = false;
+    let hasDragged = false;
+    let currentDragImg = null;
+    let startX = 0, startY = 0;
+
     // Acción: Subida de imágenes reactiva
     function triggerImageUpload(container) {
+      // Prevenir que se abra la ventana de archivos si el usuario acaba de encuadrar (arrastrar)
+      if (hasDragged) {
+        setTimeout(() => { hasDragged = false; }, 100);
+        return; 
+      }
       const fileInput = container.querySelector('input[type="file"]');
       if (fileInput) {
         fileInput.click();
       }
     }
 
-    // Compresor de imágenes en caliente: Convierte a JPEG de max 500px para almacenamiento Base64 ultra-liviano
+    // Compresor de imágenes en caliente: Convierte a JPEG manteniendo ALTA RESOLUCIÓN (max 1600px)
     function handleImageChange(event, inputElement) {
       const file = event.target.files[0];
       if (file) {
@@ -1243,8 +1255,8 @@
               let width = tempImg.width;
               let height = tempImg.height;
               
-              // Dimensión máxima recomendada para mantener el Base64 bajo los 30KB
-              const MAX_DIM = 500;
+              // Dimensión aumentada para mantener alta calidad al hacer zoom
+              const MAX_DIM = 1600;
               if (width > height) {
                 if (width > MAX_DIM) {
                   height *= MAX_DIM / width;
@@ -1262,11 +1274,17 @@
               const ctx = canvas.getContext('2d');
               ctx.drawImage(tempImg, 0, 0, width, height);
               
-              // Conversión optimizada
-              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.65);
+              // Conversión optimizada a alta calidad (0.90) para prevenir pérdida de resolución
+              const compressedBase64 = canvas.toDataURL('image/jpeg', 0.90);
               
               imgElement.src = compressedBase64;
               imgElement.classList.remove('hidden');
+              
+              // Resetear transformaciones anteriores si se sube una nueva imagen
+              imgElement.style.transform = 'scale(1) translate(0px, 0px)';
+              imgElement.dataset.scale = 1;
+              imgElement.dataset.tx = 0;
+              imgElement.dataset.ty = 0;
               
               if (placeholderIcon) {
                 placeholderIcon.classList.add('hidden');
@@ -1274,6 +1292,8 @@
               
               container.classList.remove('border-dashed');
               container.classList.add('border-solid');
+              
+              showToast('Imagen cargada. Usa la rueda del ratón para hacer ZOOM y arrastra para MOVERLA.', false);
             };
             tempImg.src = e.target.result;
           };
@@ -1281,6 +1301,65 @@
         }
       }
     }
+
+    // --- EVENTOS DE RATÓN PARA ENCUADRAR IMÁGENES (ZOOM Y PANNING) ---
+    document.addEventListener('mousedown', (e) => {
+      if (e.target.tagName === 'IMG' && !e.target.classList.contains('hidden') && e.target.parentElement.hasAttribute('onclick')) {
+        isDraggingImg = true;
+        hasDragged = false;
+        currentDragImg = e.target;
+        startX = e.clientX;
+        startY = e.clientY;
+        
+        currentDragImg.dataset.tx = currentDragImg.dataset.tx || 0;
+        currentDragImg.dataset.ty = currentDragImg.dataset.ty || 0;
+        currentDragImg.dataset.scale = currentDragImg.dataset.scale || 1;
+        
+        e.preventDefault(); // Previene que el navegador intente "arrastrar" el archivo de imagen
+      }
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDraggingImg && currentDragImg) {
+        hasDragged = true; // Marca que hubo movimiento para no abrir el explorador de archivos
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        
+        const scale = parseFloat(currentDragImg.dataset.scale || 1);
+        const tx = parseFloat(currentDragImg.dataset.tx) + (dx / scale);
+        const ty = parseFloat(currentDragImg.dataset.ty) + (dy / scale);
+        
+        currentDragImg.dataset.tx = tx;
+        currentDragImg.dataset.ty = ty;
+        currentDragImg.style.transform = `scale(${scale}) translate(${tx}px, ${ty}px)`;
+        
+        startX = e.clientX;
+        startY = e.clientY;
+      }
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDraggingImg = false;
+      currentDragImg = null;
+    });
+
+    document.addEventListener('wheel', (e) => {
+      if (e.target.tagName === 'IMG' && !e.target.classList.contains('hidden') && e.target.parentElement.hasAttribute('onclick')) {
+        e.preventDefault(); // Evita que la página haga scroll al hacer zoom en la imagen
+        hasDragged = true; // Activa flag para evitar clic accidental al terminar de hacer scroll
+        
+        let scale = parseFloat(e.target.dataset.scale || 1);
+        scale += e.deltaY * -0.002;
+        scale = Math.min(Math.max(0.3, scale), 5); // Limitar zoom entre 0.3x y 5x
+        
+        e.target.dataset.scale = scale;
+        const tx = e.target.dataset.tx || 0;
+        const ty = e.target.dataset.ty || 0;
+        
+        e.target.style.transform = `scale(${scale}) translate(${tx}px, ${ty}px)`;
+      }
+    }, { passive: false });
+    // -----------------------------------------------------------------
 
     // Acción: Guardar plantilla HTML local (Clona el estado limpio con los Base64 grabados)
     function downloadEditedHTML() {
