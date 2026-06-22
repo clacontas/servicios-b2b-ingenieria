@@ -609,7 +609,7 @@
                   <div class="flex-grow">
                     <h4 class="font-bold text-xs uppercase text-blue-900 font-poppins" contenteditable="true">02. Teltonika EYE Sensor</h4>
                     <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
-                      Sensor Inalámbrico Multifunción Bluetooth (BLE) ultra-robusto e impermeable IP67. Se vincula con dispositiovs GPS para auditar la temperatura en ruta de despacho.
+                      Baliza Bluetooth (BLE) ultra-robusta e impermeable IP67. Se vincula con gateways móviles para auditar la temperatura en ruta de despacho.
                     </p>
                   </div>
                 </div>
@@ -631,7 +631,7 @@
                   <div class="flex-grow">
                     <h4 class="font-bold text-xs uppercase text-slate-900 font-poppins" contenteditable="true">03. iButton Data Loggers</h4>
                     <p class="text-[9px] text-slate-600 mt-0.5" contenteditable="true">
-                      Dispositivo autónomo de registro térmico encapsulado en acero inoxidable, diseñado para soportar entornos industriales exigentes. Ideal para garantizar la integridad en la cadena de frío.
+                      Contacto metálico encapsulado autónomo con memoria. Ideal para auditorías directas en cajas de despacho de vacunas y fármacos.
                     </p>
                   </div>
                 </div>
@@ -1284,32 +1284,37 @@
 
     // Acción: Guardar plantilla HTML local (Clona el estado limpio con los Base64 grabados)
     function downloadEditedHTML() {
-      const docClone = document.documentElement.cloneNode(true);
+      try {
+        const docClone = document.documentElement.cloneNode(true);
 
-      // Asegurar que en el clon descargable el sidebar comience cerrado y limpio en móviles
-      const sidebarClone = docClone.querySelector('#page-builder-sidebar');
-      const overlayClone = docClone.querySelector('#sidebar-overlay');
-      if (sidebarClone) sidebarClone.classList.add('-translate-x-full');
-      if (overlayClone) overlayClone.classList.add('hidden');
-      docClone.body.classList.remove('overflow-hidden');
-      
-      // Ocultar notificaciones toast residuales en el archivo descargado
-      const toastClone = docClone.querySelector('#toast-notification');
-      if (toastClone) toastClone.classList.add('hidden');
-      
-      const htmlContent = "<!DOCTYPE html>\n" + docClone.outerHTML;
-      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
-      const url = URL.createObjectURL(blob);
-      
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'index.html';
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+        // Asegurar que en el clon descargable el sidebar comience cerrado y limpio en móviles
+        const sidebarClone = docClone.querySelector('#page-builder-sidebar');
+        const overlayClone = docClone.querySelector('#sidebar-overlay');
+        const bodyClone = docClone.querySelector('body');
+        const toastClone = docClone.querySelector('#toast-notification');
 
-      showToast('Archivo index.html descargado exitosamente.');
+        if (sidebarClone) sidebarClone.classList.add('-translate-x-full');
+        if (overlayClone) overlayClone.classList.add('hidden');
+        if (bodyClone) bodyClone.classList.remove('overflow-hidden');
+        if (toastClone) toastClone.classList.add('hidden');
+        
+        const htmlContent = "<!DOCTYPE html>\n" + docClone.outerHTML;
+        const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'index.html';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
+        showToast('Archivo index.html descargado exitosamente.');
+      } catch (error) {
+        console.error('Error al descargar el archivo:', error);
+        showToast('Error al descargar: ' + error.message, true);
+      }
     }
   </script>
 </body>
