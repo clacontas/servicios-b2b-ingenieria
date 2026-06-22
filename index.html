@@ -201,35 +201,6 @@
           </button>
         </div>
 
-        <!-- INDICADOR DE ESTADO CLOUD/SINCRONIZACIÓN CON CONFIGURADOR INCORPORADO -->
-        <div class="bg-slate-800/80 rounded-xl p-3 border border-slate-700/50 space-y-2">
-          <div class="flex items-center justify-between text-xs">
-            <span class="text-slate-400 font-semibold">Estado de Nube:</span>
-            <span id="cloud-status-badge" class="bg-slate-500/10 text-slate-400 px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wider flex items-center gap-1">
-              Modo Local
-            </span>
-          </div>
-          
-          <button id="save-cloud-btn" onclick="saveToCloud()" disabled class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs py-2 px-3 rounded-lg shadow transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed">
-            <i class="fa-solid fa-cloud-arrow-up"></i> Sincronizar en la Nube
-          </button>
-
-          <!-- Toggle de Configuración de Firebase para Marketing -->
-          <button onclick="toggleConfigPanel()" class="w-full bg-slate-750 hover:bg-slate-700 text-slate-300 border border-slate-700 hover:border-slate-650 font-medium text-[10px] py-1.5 px-3 rounded-lg transition-all flex items-center justify-center gap-1.5 mt-2">
-            <i class="fa-solid fa-gears text-sky-400"></i> Configurar Firebase (Marketing)
-          </button>
-
-          <!-- Panel de Configuración oculto por defecto -->
-          <div id="firebase-config-panel" class="hidden pt-2 border-t border-slate-700/40 space-y-2">
-            <p class="text-[9px] text-slate-400 font-inter">Pega aquí el objeto de configuración JSON o el bloque JavaScript copiado directamente de Firebase:</p>
-            <textarea id="firebase-json-input" rows="5" placeholder='const firebaseConfig = {&#10;  apiKey: "AIzaSy...",&#10;  authDomain: "..."&#10;};' class="w-full bg-slate-950 text-slate-200 border border-slate-700 rounded p-1.5 text-[9px] font-mono focus:outline-none focus:border-blue-500"></textarea>
-            <div class="flex gap-2">
-              <button onclick="saveFirebaseConfig()" class="flex-1 bg-sky-600 hover:bg-sky-500 text-white font-bold text-[10px] py-1.5 rounded transition-all">Conectar</button>
-              <button onclick="clearFirebaseConfig()" class="bg-red-950 hover:bg-red-900 text-red-300 font-semibold text-[10px] px-2 rounded transition-all" title="Eliminar Conexión"><i class="fa-solid fa-trash-can"></i></button>
-            </div>
-          </div>
-        </div>
-
         <!-- Navegación de Páginas -->
         <div class="space-y-2">
           <span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wider block">Navegación de Páginas</span>
@@ -1007,260 +978,30 @@
   </div>
 
   <!-- INTERACTIVE JS FOR BUILDING AND IMAGE UPLOADING -->
-  <script type="module">
-    // --- INTEGRACIÓN Y PERSISTENCIA CON FIREBASE FIRESTORE ---
-    import { initializeApp, getApps, deleteApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-    import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-    // ID fijo de la app para la ruta de Firestore
-    const appId = 'mci-brochure-master-app';
-    let db = null;
-    let auth = null;
-    let firebaseEnabled = false;
-
-    // Inicializar Configuración de Firebase (Inteligente y Persistente en LocalStorage)
-    window.initFirebase = async function(customConfig = null) {
-      let config = null;
-
-      // 1. Prioridad: Configuración pasada directamente (desde onload o desde el formulario)
-      if (customConfig) {
-        config = customConfig;
-      }
-
-      // 2. Segunda prioridad: Revisar si el usuario pegó una configuración manual en LocalStorage
-      if (!config) {
-        const savedConfig = localStorage.getItem('mci_firebase_config');
-        if (savedConfig) {
-          try {
-            config = JSON.parse(savedConfig);
-          } catch (e) {
-            console.error("Error al parsear config de Firebase guardada en LocalStorage", e);
-          }
-        }
-      }
-
-      if (config) {
-        try {
-          updateCloudStatus('Conectando...', 'amber');
-          
-          // PREVENCIÓN DE APP DUPLICADA: Si hay una conexión previa, se borra limpiamente
-          const activeApps = getApps();
-          if (activeApps.length > 0) {
-            for (const appInstance of activeApps) {
-              await deleteApp(appInstance);
-            }
-          }
-
-          const app = initializeApp(config);
-          auth = getAuth(app);
-          db = getFirestore(app);
-          firebaseEnabled = true;
-
-          // Autenticación anónima (habilitada en Firebase Console)
-          await signInAnonymously(auth);
-
-          onAuthStateChanged(auth, async (user) => {
-            if (user) {
-              updateCloudStatus('Nube Lista', 'emerald');
-              document.getElementById('save-cloud-btn').removeAttribute('disabled');
-              // Descargar la última copia del brochure desde la nube
-              await loadFromCloud();
-            } else {
-              updateCloudStatus('Sin Sesión', 'red');
-            }
-          });
-        } catch (e) {
-          console.error("Error al conectar con los servicios de Firebase:", e);
-          updateCloudStatus('Error Config', 'red');
-          showToast('Error al conectar con Firebase. Verifica las credenciales.', true);
-        }
-      } else {
-        updateCloudStatus('Modo Local (Offline)', 'slate');
-      }
-    }
-
-    // Funciones del Formulario del Configurar Firebase de la Barra Lateral
-    window.toggleConfigPanel = function() {
-      const panel = document.getElementById('firebase-config-panel');
-      panel.classList.toggle('hidden');
-      
-      // Auto-completar el textarea si ya hay una configuración guardada
-      const savedConfig = localStorage.getItem('mci_firebase_config');
-      if (savedConfig && !panel.classList.contains('hidden')) {
-        document.getElementById('firebase-json-input').value = savedConfig;
-      }
-    };
-
-    window.saveFirebaseConfig = async function() {
-      const input = document.getElementById('firebase-json-input').value.trim();
-      if (!input) {
-        showToast('El campo de configuración no puede estar vacío.', true);
-        return;
-      }
-
-      try {
-        // PARSER ULTRA-ROBUSTO INDEXADO:
-        // Localizamos el índice de 'apiKey' para ubicar inequívocamente el inicio del objeto
-        const apiIdx = input.indexOf('apiKey');
-        if (apiIdx === -1) {
-          throw new Error("No se detectó la clave obligatoria 'apiKey'.");
-        }
-        
-        // Encontramos la primera llave de apertura HACIA ATRÁS desde el apiKey (esto ignora los imports superiores)
-        const openBraceIdx = input.lastIndexOf('{', apiIdx);
-        // Encontramos la primera llave de cierre HACIA ADELANTE desde el apiKey
-        const closeBraceIdx = input.indexOf('}', apiIdx);
-        
-        if (openBraceIdx === -1 || closeBraceIdx === -1 || openBraceIdx > apiIdx || closeBraceIdx < apiIdx) {
-          throw new Error("No se pudo delimitar las llaves del bloque de configuración.");
-        }
-        
-        let cleaned = input.substring(openBraceIdx, closeBraceIdx + 1);
-        
-        // Eliminar comentarios de línea y de bloque
-        cleaned = cleaned.replace(/\/\*[\s\S]*?\*\/|([^\\:]|^)\/\/.*$/gm, '$1');
-        
-        // Limpiar espacios en blanco al inicio y final
-        cleaned = cleaned.trim();
-        
-        let parsedConfig;
-        try {
-          // Intentamos JSON estricto primero
-          parsedConfig = JSON.parse(cleaned);
-        } catch (jsonErr) {
-          // Si falla, reformateamos para tolerar sintaxis de objeto JavaScript nativo:
-          // 1. Envolver las llaves de claves sin comillas en comillas dobles (ej: apiKey: -> "apiKey":)
-          // 2. Reemplazar comillas simples por dobles en los valores string
-          // 3. Eliminar comas sobrantes antes de cerrar llaves (trailing commas)
-          let formatted = cleaned
-            .replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":')
-            .replace(/'/g, '"')
-            .replace(/,\s*}/g, '}');
-          
-          parsedConfig = JSON.parse(formatted);
-        }
-
-        // Validar claves mínimas obligatorias para evitar caídas en el SDK
-        if (!parsedConfig.apiKey || !parsedConfig.projectId) {
-          throw new Error("La configuración extraída está incompleta.");
-        }
-
-        localStorage.setItem('mci_firebase_config', JSON.stringify(parsedConfig));
-        showToast('¡Configuración de Firebase guardada exitosamente!');
-        
-        // Esconder panel
-        document.getElementById('firebase-config-panel').classList.add('hidden');
-        
-        // Reiniciar conexión Firebase
-        await window.initFirebase(parsedConfig);
-      } catch (err) {
-        console.error("Error al procesar el parser relajado:", err);
-        showToast('No pudimos extraer las credenciales. Asegúrate de copiar el cuadro completo de Firebase.', true);
-      }
-    };
-
-    window.clearFirebaseConfig = function() {
-      if (confirm('¿Estás seguro de que deseas eliminar las credenciales de Firebase de este equipo? El brochure volverá a Modo Local.')) {
-        localStorage.removeItem('mci_firebase_config');
-        showToast('Conexión Firebase eliminada.');
-        window.location.reload(); // Recarga la pestaña para limpiar estados de inicialización
-      }
-    };
-
-    // Al cargar la ventana, iniciar autenticación y recuperar plantilla guardada
-    window.addEventListener('load', async function() {
-      // 1. Inicializar QR interactivo
+  <script>
+    // ── INICIALIZACIÓN ──
+    window.addEventListener('load', function() {
       initQR();
-      
-      // 2. Configuración de Firebase por defecto para MCI
-      const defaultFirebaseConfig = {
-        apiKey: "AIzaSyAl_dFkF1lZ9BLw08tdwSDdrrWzxy8vscg",
-        authDomain: "mci-brochure-manager.firebaseapp.com",
-        projectId: "mci-brochure-manager",
-        storageBucket: "mci-brochure-manager.firebasestorage.app",
-        messagingSenderId: "1723495819",
-        appId: "1:1723495819:web:7f777f737cf59fd06f6b8e"
-      };
-      
-      // 3. Conectar Firebase (la función chequea si hay config guardada en LocalStorage)
-      await window.initFirebase(defaultFirebaseConfig);
+      rebindControls();
     });
 
-    // Actualiza el indicador de conexión de Firebase en el Sidebar
-    function updateCloudStatus(text, color) {
-      const badge = document.getElementById('cloud-status-badge');
-      if (!badge) return;
-      badge.textContent = text;
-      
-      // Remover clases de color previas
-      badge.className = "px-2.5 py-0.5 rounded-full font-bold text-[9px] uppercase tracking-wider flex items-center gap-1 ";
-      if (color === 'amber') badge.classList.add('bg-amber-500/10', 'text-amber-400');
-      if (color === 'emerald') badge.classList.add('bg-emerald-500/10', 'text-emerald-400');
-      if (color === 'red') badge.classList.add('bg-red-500/10', 'text-red-400');
-      if (color === 'slate') badge.classList.add('bg-slate-500/10', 'text-slate-400');
-    }
-
-    // Cargar contenido sincronizado desde Firestore
-    async function loadFromCloud() {
-      if (!db || !auth || !auth.currentUser) return;
+    function initQR() {
       try {
-        // Ruta compatible con las reglas: /artifacts/{allPaths=**}
-        const docRef = doc(db, 'artifacts', appId, 'drafts', 'main-brochure');
-        const docSnap = await getDoc(docRef);
-
-        if (docSnap.exists()) {
-          const cloudData = docSnap.data();
-          if (cloudData && cloudData.htmlContent) {
-            document.getElementById('brochure-pages-container').innerHTML = cloudData.htmlContent;
-            rebindControls();
-            initQR();
-            showToast('Brochure maestro cargado desde la nube exitosamente.');
-          }
+        const canvas = document.getElementById('qr-canvas');
+        if (canvas && typeof QRious !== 'undefined') {
+          new QRious({
+            element: canvas,
+            value: 'https://ing.mcielectronics.cl/contacto-2',
+            size: 150,
+            background: 'white',
+            foreground: '#0f172a'
+          });
         }
-      } catch (err) {
-        console.error("Error al cargar datos desde la nube:", err);
-        showToast('Error al descargar la última versión de la nube.', true);
+      } catch (e) {
+        console.error("Error al renderizar código QR:", e);
       }
     }
 
-    // Guardar cambios a Firestore con protección de contraseña (Clave de Edición: mci2026)
-    window.saveToCloud = async function() {
-      if (!db || !auth || !auth.currentUser) {
-        showToast('La conexión con la base de datos no está disponible.', true);
-        return;
-      }
-
-      const passcode = prompt("Por favor, ingresa la clave de edición para guardar en la nube:");
-      if (passcode !== "mci2026") {
-        if (passcode !== null) {
-          showToast('Clave incorrecta. Los cambios no se han guardado.', true);
-        }
-        return;
-      }
-
-      updateCloudStatus('Guardando...', 'amber');
-      try {
-        const pagesContainer = document.getElementById('brochure-pages-container');
-        
-        // Ruta compatible con las reglas: /artifacts/{allPaths=**}
-        const docRef = doc(db, 'artifacts', appId, 'drafts', 'main-brochure');
-        await setDoc(docRef, {
-          htmlContent: pagesContainer.innerHTML,
-          lastUpdated: new Date().toISOString(),
-          updatedBy: auth.currentUser.uid
-        });
-
-        updateCloudStatus('Sincronizado', 'emerald');
-        showToast('¡Plantilla maestra guardada en la nube con éxito!');
-      } catch (err) {
-        console.error("Error al guardar en Firestore:", err);
-        updateCloudStatus('Error al Guardar', 'red');
-        showToast('Ocurrió un error al sincronizar con la nube.', true);
-      }
-    };
-
-    // Re-vincula todos los eventos de edición sobre los bloques dinámicos y cargadores tras refrescar el HTML
     function rebindControls() {
       const blocks = document.querySelectorAll('.mci-block');
       blocks.forEach(block => {
@@ -1273,7 +1014,6 @@
       });
     }
 
-    // Notificaciones toast amigables integradas en la app (no bloqueantes)
     function showToast(message, isError = false) {
       const toast = document.getElementById('toast-notification');
       const toastMsg = document.getElementById('toast-message');
@@ -1296,27 +1036,6 @@
       }, 4000);
     }
 
-    // Inicializa o recrea el QR
-    function initQR() {
-      try {
-        const canvas = document.getElementById('qr-canvas');
-        if (canvas && typeof QRious !== 'undefined') {
-          new QRious({
-            element: canvas,
-            value: 'https://ing.mcielectronics.cl/contacto-2',
-            size: 150,
-            background: 'white',
-            foreground: '#0f172a'
-          });
-        }
-      } catch (e) {
-        console.error("Error al renderizar código QR:", e);
-      }
-    }
-  </script>
-
-  <!-- INTERACTIVE JS FOR BUILDING AND IMAGE UPLOADING -->
-  <script>
     // ── EXPORTAR A PDF: muestra modal con instrucciones antes de imprimir ──
     function exportToPDF() {
       document.getElementById('pdf-modal').classList.remove('hidden');
@@ -1574,17 +1293,23 @@
       if (overlayClone) overlayClone.classList.add('hidden');
       docClone.body.classList.remove('overflow-hidden');
       
+      // Ocultar notificaciones toast residuales en el archivo descargado
+      const toastClone = docClone.querySelector('#toast-notification');
+      if (toastClone) toastClone.classList.add('hidden');
+      
       const htmlContent = "<!DOCTYPE html>\n" + docClone.outerHTML;
       const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8' });
       const url = URL.createObjectURL(blob);
       
       const a = document.createElement('a');
       a.href = url;
-      a.download = 'brochure_mci_personalizado_master.html';
+      a.download = 'index.html';
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+
+      showToast('Archivo index.html descargado exitosamente.');
     }
   </script>
 </body>
